@@ -133,7 +133,6 @@ def default_kernel_params_grid(g1=None, g2=None):
         'aitchison': {'c': np.logspace(-7, -3, 5)},
         'aitchison-rbf': {'c': np.logspace(-7, -3, 5), 'g': grid_aitrbf},
         'heat-diffusion': {'t': np.linspace(0.9, 1.1, 5)*0.25/np.pi}
-        # 'heat-diffusion': {'t': np.logspace(-2, 2, 5)}
     }
     return kernel_params_dict
 
@@ -156,19 +155,8 @@ def default_weighted_kernel_params_grid(w_unifrac, g1=None, g2=None):
         'hilbertian_weighted': {'a': [1, 10, np.inf], 'b': [-1, -10, -np.inf], "w": w_unifrac},
         'aitchison_weighted': {'c': np.logspace(-7, -3, 5), 'w': w_unifrac},
         'aitchison-rbf_weighted': {'c': np.logspace(-7, -3, 5), 'g': grid_aitrbf, 'w': w_unifrac},
-        'heat-diffusion_weighted': {'t': np.logspace(-2, 2, 5), 'w': w_unifrac}
+        'heat-diffusion': {'t': np.linspace(0.9, 1.1, 5)*0.25/np.pi}
     }
-    # kernel_params_dict = {
-    #     'linear_weighted': {'w': w_unifrac},
-    #     'rbf_weighted': {'g': np.logspace(-2, 2, 5), "w": w_unifrac},
-    #     # Note: only valid
-    #     'generalized-js_weighted': {'a': [1, np.inf], 'b': [0.5, 1, np.inf], "w": w_unifrac},
-    #     # Note: only valid when a >= 1 b <= -1 and not both a, b are inf
-    #     'hilbertian_weighted': {'a': [1, np.inf], 'b': [-1, -np.inf], "w": w_unifrac},
-    #     'aitchison_weighted': {'c': np.logspace(-7, -3, 5), 'w': w_unifrac},
-    #     'aitchison-rbf_weighted': {'c': np.logspace(-7, -3, 5), 'g': np.logspace(-2, 2, 5), 'w': w_unifrac},
-    #     'heat-diffusion_weighted': {'t': np.logspace(-2, 2, 5), 'w': w_unifrac}
-    # }
     return kernel_params_dict
 
 

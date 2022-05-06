@@ -84,7 +84,7 @@ def compute_unifrac_similarity(comp_lbl, biom_file, tree_file,
     # convert to similarity matrix
     # weight_unifrac = normalize(1.0 - dist_unifrac)
     weight_unifrac = (1.0 - dist_unifrac)
-    print(weight_unifrac.sum(axis=1).max())
+    # print(weight_unifrac.sum(axis=1).max())
     # weight_unifrac = dist_unifrac.sum(axis=1).max() - dist_unifrac
     if ensure_psd:
         # MMT = weight_unifrac.T.dot(weight_unifrac)
