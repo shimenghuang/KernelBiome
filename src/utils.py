@@ -44,11 +44,14 @@ def get_internel_kernel_name(kernel_name):
     return kernel_names_dict[kernel_name]
 
 
-def kernel_args_str_to_dict(kernel_args_key):
+def kernel_args_str_to_dict(kernel_args_key, weighted=False):
     """
     Convert a concatenated string of kernel argument e.g. 'aitchison-rbf_c_0.0001_g_0.1' to a dict.
     """
-    split_res = kernel_args_key.split('_', maxsplit=1)
+    if weighted:
+        split_res = kernel_args_key.split('_weighted_', maxsplit=1)
+    else:
+        split_res = kernel_args_key.split('_', maxsplit=1)
     if len(split_res) == 1:
         return {}
     else:
@@ -62,7 +65,7 @@ def kernel_args_str_to_dict(kernel_args_key):
         return kernel_args_dict
 
 
-def kernel_args_str_to_k_fun(kernel_args_key):
+def kernel_args_str_to_k_fun(kernel_args_key, weighted=False, w_mat=None):
     """
     Convert a concatenated string of kernel argument to the corresponding kernel function `k_<internel_kernel_name>`.
 
@@ -70,8 +73,12 @@ def kernel_args_str_to_k_fun(kernel_args_key):
     """
     internel_kernel_name = get_internel_kernel_name(
         kernel_args_key.split('_', maxsplit=1)[0])
-    kernel_args_dict = kernel_args_str_to_dict(kernel_args_key)
-    return lambda x, y: eval('k_'+internel_kernel_name)(x, y, **kernel_args_dict)
+    kernel_args_dict = kernel_args_str_to_dict(
+        kernel_args_key, weighted=weighted)
+    if weighted:
+        return lambda x, y: eval('k_'+internel_kernel_name+'_weighted')(x, y, w=w_mat, **kernel_args_dict)
+    else:
+        return lambda x, y: eval('k_'+internel_kernel_name)(x, y, **kernel_args_dict)
 
 
 # ---- pipeline utilities ----
@@ -155,7 +162,7 @@ def default_weighted_kernel_params_grid(w_unifrac, g1=None, g2=None):
         'hilbertian_weighted': {'a': [1, 10, np.inf], 'b': [-1, -10, -np.inf], "w": w_unifrac},
         'aitchison_weighted': {'c': np.logspace(-7, -3, 5), 'w': w_unifrac},
         'aitchison-rbf_weighted': {'c': np.logspace(-7, -3, 5), 'g': grid_aitrbf, 'w': w_unifrac},
-        'heat-diffusion': {'t': np.linspace(0.9, 1.1, 5)*0.25/np.pi}
+        'heat-diffusion_weighted': {'t': np.linspace(0.9, 1.1, 5)*0.25/np.pi}
     }
     return kernel_params_dict
 
@@ -163,66 +170,34 @@ def default_weighted_kernel_params_grid(w_unifrac, g1=None, g2=None):
 def get_weighted_kmat_with_params(kernel_params_dict, w_unifrac=None):
     kmat_with_params = {}
     for kname, params in kernel_params_dict.items():
-        if kname == 'linear':
-            kmat_with_params[kname] = kmat_linear
         if kname == 'linear_weighted':
             kmat_with_params[f'{kname}'] = wrap(
                 kmat_linear_weighted, w=w_unifrac)
-
-        if kname == 'rbf':
-            for g in params['g']:
-                kmat_with_params[f'{kname}_g_{g}'] = wrap(kmat_rbf, g=g)
         if kname == 'rbf_weighted':
             for g in params['g']:
                 kmat_with_params[f'{kname}_g_{g}'] = wrap(
                     kmat_rbf_weighted, g=g, w=w_unifrac)
-
-        if kname == 'generalized-js':
-            params_ab = list(product(params['a'], params['b']))
-            for ab in params_ab:
-                if ab[0] >= 1 and ab[1] >= 0.5 and ab[1] <= ab[0]:
-                    kmat_with_params[f'{kname}_a_{ab[0]}_b_{ab[1]}'] = wrap(
-                        kmat_hilbert1, a=ab[0], b=ab[1])
         if kname == 'generalized-js_weighted':
             params_ab = list(product(params['a'], params['b']))
             for ab in params_ab:
                 if ab[0] >= 1 and ab[1] >= 0.5 and ab[1] <= ab[0]:
                     kmat_with_params[f'{kname}_a_{ab[0]}_b_{ab[1]}'] = wrap(kmat_hilbert1_weighted, a=ab[0], b=ab[1],
                                                                             w=w_unifrac)
-        if kname == 'hilbertian':
-            params_ab = list(product(params['a'], params['b']))
-            for ab in params_ab:
-                if ab[0] >= 1 and ab[1] <= -1 and (not jnp.isinf(ab[0]) or not jnp.isinf(ab[1])):
-                    kmat_with_params[f'{kname}_a_{ab[0]}_b_{ab[1]}'] = wrap(
-                        kmat_hilbert2, a=ab[0], b=ab[1])
         if kname == 'hilbertian_weighted':
             params_ab = list(product(params['a'], params['b']))
             for ab in params_ab:
                 if ab[0] >= 1 and ab[1] <= -1 and (not jnp.isinf(ab[0]) or not jnp.isinf(ab[1])):
                     kmat_with_params[f'{kname}_a_{ab[0]}_b_{ab[1]}'] = wrap(kmat_hilbert2_weighted, a=ab[0], b=ab[1],
                                                                             w=w_unifrac)
-        if kname == 'aitchison':
-            for c in params['c']:
-                kmat_with_params[f'{kname}_c_{c}'] = wrap(
-                    kmat_aitchison, c_X=c, c_Y=c)
         if kname == 'aitchison_weighted':
             for c in params['c']:
                 kmat_with_params[f'{kname}_c_{c}'] = wrap(
-                    kmat_aitchison_weighted, c_X=c, c_Y=c, w=w_unifrac)
-
-        if kname == 'aitchison-rbf':
-            params_cg = list(product(params['c'], params['g']))
-            for cg in params_cg:
-                kmat_with_params[f'{kname}_c_{cg[0]}_g_{cg[1]}'] = wrap(kmat_aitchison_rbf, g=cg[1], c_X=cg[0],
-                                                                        c_Y=cg[0])
+                    kmat_aitchison_weighted, c=c, w=w_unifrac)
         if kname == 'aitchison-rbf_weighted':
             params_cg = list(product(params['c'], params['g']))
             for cg in params_cg:
-                kmat_with_params[f'{kname}_c_{cg[0]}_g_{cg[1]}'] = wrap(kmat_aitchison_rbf_weighted, g=cg[1], c_X=cg[0],
-                                                                        c_Y=cg[0], w=w_unifrac)
-        if kname == 'heat-diffusion':
-            for t in params['t']:
-                kmat_with_params[f'{kname}_t_{t}'] = wrap(kmat_hd, t=t)
+                kmat_with_params[f'{kname}_c_{cg[0]}_g_{cg[1]}'] = wrap(
+                    kmat_aitchison_rbf_weighted, g=cg[1], c=cg[0], w=w_unifrac)
         if kname == 'heat-diffusion_weighted':
             for t in params['t']:
                 kmat_with_params[f'{kname}_t_{t}'] = wrap(

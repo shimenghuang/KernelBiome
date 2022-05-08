@@ -61,11 +61,11 @@ def kmat_hd_weighted(X, Y, t, w):
 
 # ------------------------------------------------------------------------------
 # -------------------------- Aitchison Linear Kernel ---------------------------
-@partial(jit, static_argnames=('c_X', 'c_Y'), inline=True)
-def k_aitchison_weighted(x, y, c_X, c_Y, w):
-    x = x + c_X
+@partial(jit, static_argnames=('c'), inline=True)
+def k_aitchison_weighted(x, y, c, w):
+    x = x + c
     x = x / x.sum()
-    y = y + c_Y
+    y = y + c
     y = y / y.sum()
     gm_x = gmean(x)
     gm_y = gmean(y)
@@ -81,17 +81,17 @@ def k_aitchison_weighted(x, y, c_X, c_Y, w):
     return jnp.sum(w * (clr_x * clr_y))
 
 
-def kmat_aitchison_weighted(x, y, c_X, c_Y, w):
-    return gram(k_aitchison_weighted, x, y, c_X=c_X, c_Y=c_Y, w=w)
+def kmat_aitchison_weighted(x, y, c, w):
+    return gram(k_aitchison_weighted, x, y, c=c, w=w)
 
 
 # ------------------------------------------------------------------------------
 # --------------------------- Aitchison RBF Kernel -----------------------------
-@partial(jit, static_argnames=('g', 'c_X', 'c_Y'), inline=True)
-def k_aitchison_rbf_weighted(x, y, g, c_X, c_Y, w):
-    x = x + c_X
+@partial(jit, static_argnames=('g', 'c'), inline=True)
+def k_aitchison_rbf_weighted(x, y, g, c, w):
+    x = x + c
     x = x / x.sum()
-    y = y + c_Y
+    y = y + c
     y = y / y.sum()
     gm_x = gmean(x)
     gm_y = gmean(y)
@@ -109,8 +109,8 @@ def k_aitchison_rbf_weighted(x, y, g, c_X, c_Y, w):
     return jnp.exp(k)
 
 
-def kmat_aitchison_rbf_weighted(x, y, g, c_X, c_Y, w):
-    return gram(k_aitchison_rbf_weighted, x, y, g=g, c_X=c_X, c_Y=c_Y, w=w)
+def kmat_aitchison_rbf_weighted(x, y, g, c, w):
+    return gram(k_aitchison_rbf_weighted, x, y, g=g, c=c, w=w)
 
 # ------------------------------------------------------------------------------
 # --------------------------------- HILBERTIAN 1 -------------------------------
@@ -202,6 +202,22 @@ def k_hilbert1_ab_weighted(x, y, a, b, w):
     return fac * jnp.sum(w * (2.0 ** inv_b * t1 - 2.0 ** inv_a * t2))
 
 
+def k_hilbert1_weighted(x, y, a, b, w):
+    assert(a >= 1)
+    assert(b >= 0.5 and b <= a)
+    if jnp.isinf(a) and a == b:
+        # Note: jnp.inf == jnp.inf is True
+        return k_hilbert1_b_inf_weighted(x, y, w)
+    elif not jnp.isinf(a) and a == b:
+        return k_hilbert1_b_fin_weighted(x, y, b=a, w=w)
+    elif jnp.isinf(a) and not jnp.isinf(b):
+        # Note: with a = inf and b = 1, should be the same as 2*kmat_tv(X,Y)
+        #  but kmat_tv should be faster
+        return k_hilbert1_a_inf_b_fin_weighted(x, y, b=b, w=w)
+    else:
+        return k_hilbert1_ab_weighted(x, y, a=a, b=b, w=w)
+
+
 def kmat_hilbert1_weighted(X, Y, a, b, w):
     # print(f'a = {a}')
     # print(f'b = {b}')
@@ -223,24 +239,10 @@ def kmat_hilbert1_weighted(X, Y, a, b, w):
         # print("diff a b case")
         return gram(k_hilbert1_ab_weighted, X, Y, a=a, b=b, w=w)
 
-# def kmat_hilbert1_ab_weighted(x, y, a, b, w):
-#    return gram(kmat_hilbert1_ab_weighted, x, y, a, b, w)
-
-
-# def kmat_hilbert1_a_inf_b_inf_weighted(x, y, b, w):
-#    return gram(k_hilbert1_a_inf_b_fin_weighted, x, y, b, w)
-
-
-# def kmat_hilbert1_b_fin_weighted(x, y, b, w):
-#    return gram(k_hilbert1_b_fin_weighted, x, y, b, w)
-
-
-# def kmat_hilbert1_b_inf_weighted(x, y, w):
-#    return gram(k_hilbert1_b_inf_weighted, x, y, w)
-
-
 # ------------------------------------------------------------------------------
 # --------------------------------- HILBERTIAN 2 -------------------------------
+
+
 @partial(jit, static_argnames=('b'), inline=True)
 def k_hilbert2_a_inf_b_fin_weighted(x, y, b, w):
     inv_p = 1.0 / x.shape[0]
@@ -299,6 +301,18 @@ def k_hilbert2_ab_weighted(x, y, a, b, w):
     t1 = (xa + ya) ** inv_a - (xa + inv_pa) ** inv_a - (ya + inv_pa) ** inv_a
     t2 = (xb + yb) ** inv_b - (xb + inv_pb) ** inv_b - (yb + inv_pb) ** inv_b
     return fac * jnp.nansum(w * (2.0 ** inv_b * t1 - 2.0 ** inv_a * t2))
+
+
+def k_hilbert2_weighted(x, y, a, b, w):
+    assert(a >= 1)
+    assert(b <= -1)
+    assert(not jnp.isinf(a) or not jnp.isinf(b))
+    if jnp.isinf(a) and not jnp.isinf(b):
+        return k_hilbert2_a_inf_b_fin_weighted(x, y, b=b, w=w)
+    elif not jnp.isinf(a) and jnp.isinf(b):
+        return k_hilbert2_a_fin_b_neginf_weighted(x, y, a=a, w=w)
+    else:
+        return k_hilbert2_ab_weighted(x, y, a=a, b=b, w=w)
 
 
 def kmat_hilbert2_weighted(X, Y, a, b, w):

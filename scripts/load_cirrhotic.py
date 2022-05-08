@@ -3,12 +3,9 @@
 # ^^^^^^
 
 import sys
-from src.load_data import *
-from src.kernels_jax import *
-from src.cfi import *
-from src.utils import *
 import pandas as pd
 import numpy as np
+from load_data_helper import *
 
 
 # %%
@@ -73,7 +70,7 @@ def filter_prep(X_count, comp_lbl):
 def main(data_path, seed_num=2022):
     X_count, y, comp_lbl = load_agg_shuffle(data_path, seed_num)
     X_df, label = filter_prep(X_count, comp_lbl)
-    return X_df, label
+    return X_df, y, label
 
 
 if __name__ == "__main__":
