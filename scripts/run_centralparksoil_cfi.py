@@ -18,7 +18,6 @@ from src.utils import *
 import load_centralparksoil
 import setup_params
 
-
 seed_num = 2022
 today = date.today()
 
@@ -28,8 +27,8 @@ today = date.today()
 
 # input and output paths
 if on_computerome:
-    data_path = "kernelbiome_clean/data/CentralParkSoil"
-    output_path = "kernelbiome_clean/scripts/output"
+    data_path = "KernelBiome/data/CentralParkSoil"
+    output_path = "KernelBiome/scripts/output"
 else:
     data_path = "/Users/hrt620/Documents/projects/kernelbiome_proj/kernelbiome_clean/data/CentralParkSoil"
     output_path = "/Users/hrt620/Documents/projects/kernelbiome_proj/kernelbiome_clean/scripts/output"
