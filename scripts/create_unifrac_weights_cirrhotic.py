@@ -9,9 +9,10 @@ if on_computerome:
 else:
     sys.path.insert(0, "../")  # nopep8
 
+# from os.path import join
 import matplotlib.pyplot as plt
-from os.path import join
 from src.helpers_weighting import *
+import load_cirrhotic
 
 # %%
 # load data
@@ -24,7 +25,8 @@ else:
     file_dir = ""  # local
     data_path = "/Users/hrt620/Documents/projects/kernelbiome_proj/kernelbiome_clean/data/MLRepo/qin2014"
 
-exec(open(join(file_dir, "load_cirrhotic.py")).read())
+# exec(open(join(file_dir, "load_cirrhotic.py")).read())
+X_df, label = load_cirrhotic.main(data_path=data_path, seed_num=2022)
 
 # %%
 # compute unifrac weight
