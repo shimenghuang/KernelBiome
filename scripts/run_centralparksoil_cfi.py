@@ -2,8 +2,12 @@
 # load libs
 # ^^^^^^
 
+on_computerome = True  # nopep8
 import sys  # nopep8
-sys.path.insert(0, "../")  # nopep8
+if on_computerome:
+    sys.path.insert(0, "./KernelBiome/")
+else:
+    sys.path.insert(0, "../")  # nopep8
 
 from os.path import join
 from datetime import date
@@ -14,7 +18,7 @@ from src.utils import *
 import load_centralparksoil
 import setup_params
 
-on_computerome = False
+
 seed_num = 2022
 today = date.today()
 
