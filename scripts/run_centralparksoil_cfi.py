@@ -89,7 +89,7 @@ X_all /= X_all.sum(axis=1)[:, None]
 model_selected = best_models.iloc[0]
 print(model_selected)
 pred_fun, gscv = refit_best_model(X_all, y, 'KernelRidge', param_grid_kr, model_selected,
-                                  'neg_mean_squared_error', center_kmat=True, n_fold=5, n_jobs=6, verbose=0)
+                                  'neg_mean_squared_error', center_kmat=True, n_fold=5, n_jobs=-1, verbose=0)
 print(gscv.best_estimator_)
 
 # %%
@@ -146,7 +146,7 @@ X_all /= X_all.sum(axis=1)[:, None]
 model_selected = best_models.iloc[0]
 print(model_selected)
 pred_fun, gscv = refit_best_model(X_all, y, 'KernelRidge', param_grid_kr, model_selected,
-                                  'neg_mean_squared_error', center_kmat=True, n_fold=5, n_jobs=6, verbose=0)
+                                  'neg_mean_squared_error', center_kmat=True, n_fold=5, n_jobs=-1, verbose=0)
 print(gscv.best_estimator_)
 
 # %%
