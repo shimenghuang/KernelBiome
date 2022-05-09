@@ -166,7 +166,15 @@ print(gscv.best_estimator_)
 # np.save(join(output_path, "centralparksoil_weighted_MA_cfi_vals.npy"),
 #         centralparksoil_cfi_vals)
 
-supp_grid = get_supp_grid(X_all, n_grid=100)
-centralparksoil_cpd_vals = get_cfi(X_all, supp_grid, pred_fun)
+# only calculate the top 10 species according to weighted CFI to save time
+centralparksoil_ma_cfi_vals = np.load(
+    "output/centralparksoil_weighted_MA_cfi_vals.npy")
+selected_comp = np.argsort(-np.abs(centralparksoil_ma_cfi_vals))[:10]
+
+supp_grid = get_supp_grid(X_all[:, selected_comp], n_grid=20)
+centralparksoil_cpd_vals = get_cfi(
+    X_all[:, selected_comp], supp_grid, pred_fun)
 np.save(join(output_path, "centralparksoil_weighted_MA_cpd_vals.npy"),
         centralparksoil_cpd_vals)
+
+# qsub -W group_list=ku_00126 -A ku_00126 -l nodes=1:ppn=40,mem=185gb,walltime=54000 run_job_centralparksoil.sh
