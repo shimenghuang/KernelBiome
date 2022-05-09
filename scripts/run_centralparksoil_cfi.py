@@ -167,6 +167,6 @@ print(gscv.best_estimator_)
 #         centralparksoil_cfi_vals)
 
 supp_grid = get_supp_grid(X_all, n_grid=100)
-centralparksoil_cpd_vals = get_cfi(X_all, X_all, pred_fun)
+centralparksoil_cpd_vals = get_cfi(X_all, supp_grid, pred_fun)
 np.save(join(output_path, "centralparksoil_weighted_MA_cpd_vals.npy"),
         centralparksoil_cpd_vals)
