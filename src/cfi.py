@@ -279,7 +279,7 @@ def plot_cfi_index(cfi_index_vals, fmt='%.2f', labels=None, colors=None, axs=Non
     axs.yaxis.set_visible(False)
     plt.setp(axs.spines.values(), visible=False)
     axs.tick_params(bottom=False, labelbottom=False)
-    axs.set_title(r'CFI', y=-0.1)
+    axs.set_title(r'CFI', y=-0.2)
     return axs
 
 

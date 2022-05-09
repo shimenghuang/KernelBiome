@@ -153,17 +153,20 @@ print(gscv.best_estimator_)
 # 2.3) Weighted (MA): calculate CFI and CPD values
 # ^^^^^^^
 
-df = df_ke_dual_mat(X_all, X_all,
-                    gscv.best_estimator_.dual_coef_,
-                    range(X_all.shape[0]),
-                    kernel_args_str_to_k_fun(model_selected.estimator_key,
-                                             weighted=True,
-                                             w_mat=w_unifrac_ma))
+# Note: comment out for now since it was done and collected, and it takes long time to rerun
+# df = df_ke_dual_mat(X_all, X_all,
+#                     gscv.best_estimator_.dual_coef_,
+#                     range(X_all.shape[0]),
+#                     kernel_args_str_to_k_fun(model_selected.estimator_key,
+#                                              weighted=True,
+#                                              w_mat=w_unifrac_ma))
+# np.save(join(output_path, "centralparksoil_weighted_MA_cfi_df.npy"), df)
 
-centralparksoil_cfi_vals = get_perturbation_cfi_index(X_all, df)
-np.save(join(output_path, "centralparksoil_weighted_MA_cfi_vals.npy"),
-        centralparksoil_cfi_vals)
+# centralparksoil_cfi_vals = get_perturbation_cfi_index(X_all, df)
+# np.save(join(output_path, "centralparksoil_weighted_MA_cfi_vals.npy"),
+#         centralparksoil_cfi_vals)
 
+supp_grid = get_supp_grid(X_all, n_grid=100)
 centralparksoil_cpd_vals = get_cfi(X_all, X_all, pred_fun)
 np.save(join(output_path, "centralparksoil_weighted_MA_cpd_vals.npy"),
         centralparksoil_cpd_vals)

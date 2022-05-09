@@ -33,15 +33,18 @@ print(colors_all.shape)
 data_path = "/Users/hrt620/Documents/projects/kernelbiome_proj/kernelbiome_clean/data/MLRepo/qin2014"
 X_df, y, label = load_cirrhotic.main(data_path=data_path, seed_num=seed_num)
 
+# Unweighted CFI
 cirrhotic_cfi_vals = np.load("output/cirrhotic_unweighted_cfi_vals.npy")
 
+# Weighted CFI (M^A)
 cirrhotic_ma_cfi_vals = np.load("output/cirrhotic_weighted_MA_cfi_vals.npy")
 
 # %%
-# TODO: create a figure with three subplots as in Fig 4, but including all comp
+# Create a 3-subplot plot for the appendix
 # ^^^^^^
 
-selected_comp = np.argsort(-np.abs(cirrhotic_cfi_vals))[:10]
+selected_comp = np.argsort(-np.abs(cirrhotic_cfi_vals))
+
 short_label = [lbl.split(';')[-1] for lbl in label]
 short_label = [lbl.split('__')[1] for lbl in short_label]
 short_label = np.array([lbl.replace('_', ' ') for lbl in short_label])
@@ -56,19 +59,56 @@ rf.fit(X_all, y)
 cirrhotic_gi_vals = rf.feature_importances_
 
 # plot CFI, weighted CFI, and GI
-cfi_vs_gi_df = pd.DataFrame({
+cfi_and_gi_df = pd.DataFrame({
     'label': short_label[selected_comp],
     'cfi_vals': cirrhotic_cfi_vals[selected_comp],
     'ma_cfi_vals': cirrhotic_ma_cfi_vals[selected_comp],
     'pi_vals': cirrhotic_gi_vals[selected_comp]
 })
-fig, axs = plt.subplots(1, 3)
 
-# cfi_vs_gi_df.plot(
-#     x="label", y=["abs_cfi_vals", "pi_vals"],
-#     secondary_y='pi_vals',
-#     kind="bar", ax=axs)
-fig.set_size_inches(8, 5)
-fig.savefig("output/tmp_cirrhotic_cfi_vs_gi.pdf", bbox_inches="tight")
+fig, axs = plt.subplots(1, 3,
+                        gridspec_kw={'width_ratios': [2, 2, 1]},
+                        constrained_layout=True)
+
+cfi_and_gi_df.plot(
+    x="label", y="cfi_vals",
+    kind="barh", ax=axs[0],
+    color=tuple(colors_all[0]),
+    alpha=0.7,
+    legend=None
+)
+axs[0].set_title('KernelBiome')
+axs[0].set_xlabel('CFI')
+axs[0].set_ylabel('')
+axs[0].invert_yaxis()
+
+cfi_and_gi_df.plot(
+    x="label", y="ma_cfi_vals",
+    kind="barh", ax=axs[1],
+    color=tuple(colors_all[3]),
+    alpha=0.7,
+    legend=None
+)
+axs[1].set_title('KernelBiome-UF')
+axs[1].set_xlabel('CFI')
+axs[1].set_ylabel('')
+axs[1].yaxis.set_ticklabels([])
+axs[1].invert_yaxis()
+
+cfi_and_gi_df.plot(
+    x="label", y="pi_vals",
+    kind="barh", ax=axs[2],
+    color=tuple(colors_all[4]),
+    alpha=0.7,
+    legend=None
+)
+axs[2].set_title('RF')
+axs[2].set_xlabel('Gini-Imp')
+axs[2].set_ylabel('')
+axs[2].yaxis.set_ticklabels([])
+axs[2].invert_yaxis()
+
+fig.set_size_inches(6, 10)
+fig.savefig("output/cirrhotic_cfi_and_gi_full.pdf", bbox_inches="tight")
 
 # %%
