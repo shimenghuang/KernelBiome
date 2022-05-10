@@ -64,14 +64,13 @@ def simpsons_diversity(x):
 
 
 colors = [tuple(c) for c in colors_all[[8, 9]]]
+ms = ['o', '^']
 labels = ['Healthy', 'Cirrhosis']
 
 fig, axs = plt.subplots(1, 2,
                         gridspec_kw={'width_ratios': [1.8, 1]},
-                        # constrained_layout=True,
                         figsize=(5, 4))
 
-ms = ['o', '^']
 Z1 = Phi(X_all, X_all, model_selected.kmat_fun,
          center=True, pc=0, return_mean=False)
 Z2 = Phi(X_all, X_all, model_selected.kmat_fun,

@@ -137,7 +137,7 @@ train_scores_all, test_scores_all, selected_params_all = run_experiments(X_all,
 best_models = top_models_in_each_group(
     weighted_kmat_with_params_ma, train_scores_all, test_scores_all, selected_params_all, top_n=1, kernel_mod_only=True)
 best_models.to_csv(
-    f"cirrhotic_weighted_MA_best_models_{today.strftime('%b-%d-%Y')}.csv", index=False)
+    join(output_path, f"cirrhotic_weighted_MA_best_models_{today.strftime('%b-%d-%Y')}.csv", index=False))
 
 # %%
 # 2.2) Weighted (MA): refit the best kernel
@@ -167,5 +167,101 @@ np.save(join(output_path, "cirrhotic_weighted_MA_cfi_vals.npy"), cirrhotic_cfi_v
 
 cirrhotic_cpd_vals = get_cfi(X_all, X_all, pred_fun)
 np.save(join(output_path, "cirrhotic_weighted_MA_cpd_vals.npy"), cirrhotic_cpd_vals)
+
+# %%
+# 3.1) Artifically weighted CFI
+# ^^^^^^
+
+X_comp = X_df.to_numpy().astype('float').T
+X_comp /= X_comp.sum(axis=1)[:, None]
+
+# for rbf
+K = squared_euclidean_distances(X_comp, X_comp)
+k_triu = K[np.triu_indices(n=K.shape[0], k=1, m=K.shape[1])]
+g1 = 1.0/np.median(k_triu)
+print(g1)
+
+# for aitchison-rbf
+Xc = X_comp + 1e-5
+gm_Xc = gmean(Xc, axis=1)
+clr_Xc = np.log(Xc/gm_Xc[:, None])
+K = squared_euclidean_distances(clr_Xc, clr_Xc)
+k_triu = K[np.triu_indices(n=K.shape[0], k=1, m=K.shape[1])]
+g2 = 1.0/np.median(k_triu)
+print(g2)
+
+X_keep = X_df.to_numpy().astype('float').T
+X_keep = X_keep/X_keep.sum(axis=1)[:, None]  # 102, 36
+dist_mat = np.ones(
+    (X_keep.shape[1], X_keep.shape[1])) - np.eye(X_keep.shape[1])
+dist_mat[[102, 36], [36, 102]] = 0
+
+M = 1.0-dist_mat
+D = np.diag(1.0/np.sqrt(M.sum(axis=1)))
+W1 = D.dot(M).dot(D)
+
+param_grid_svm = dict(C=[10**x for x in [-3, -2, -1, 0, 1, 2, 3]])
+print(param_grid_svm)
+
+weighted_kernel_params_dict_art = default_weighted_kernel_params_grid(
+    W1, g1, g2)
+weighted_kmat_with_params_art = get_weighted_kmat_with_params(
+    weighted_kernel_params_dict_art, w_unifrac=W1)
+
+train_scores_all, test_scores_all, selected_params_all = run_experiments(X_keep,
+                                                                         y,
+                                                                         weighted_kmat_with_params_art,
+                                                                         param_grid_svm,
+                                                                         None,
+                                                                         None,
+                                                                         center_kmat=False,
+                                                                         n_fold_outer=10,
+                                                                         n_fold_inner=5,
+                                                                         type='classification',
+                                                                         scoring='accuracy',
+                                                                         kernel_estimator='SVC',
+                                                                         n_jobs=-1,
+                                                                         random_state=None,
+                                                                         verbose=0,
+                                                                         do_save=False)
+best_models = top_models_in_each_group(
+    weighted_kmat_with_params_art, train_scores_all, test_scores_all, selected_params_all, top_n=1, kernel_mod_only=True)
+best_models.to_csv(
+    join(output_path, f"cirrhotic_weighted_art_best_models_{today.strftime('%b-%d-%Y')}.csv"), index=False)
+
+# %%
+# 3.2) refit best model
+# ^^^^^^
+
+model_selected = best_models.iloc[0]
+print(model_selected)
+# refit model
+pred_fun, gscv = refit_best_model(X_keep, y, 'SVC', param_grid_svm, model_selected,
+                                  'accuracy', center_kmat=False, n_fold=5, n_jobs=6, verbose=0)
+print(gscv.best_estimator_)
+
+df = df_ke_dual_mat(X_keep, X_keep, gscv.best_estimator_.dual_coef_[
+    0], gscv.best_estimator_.support_, wrap(k_aitchison_weighted, c=1e-5, w=W1))
+cfi_vals_art = get_perturbation_cfi_index(X_keep, df)
+
+# %%
+# 3.3) Artificially weighted: calculate CFI and CPD values
+# ^^^^^^^
+
+df = df_ke_dual_mat(X_comp, X_comp,
+                    gscv.best_estimator_.dual_coef_[0],
+                    gscv.best_estimator_.support_,
+                    kernel_args_str_to_k_fun(model_selected.estimator_key,
+                                             weighted=True,
+                                             w_mat=W1))
+np.save(join(output_path, "cirrhotic_weighted_artificial_cfi_df.npy"), df)
+
+cirrhotic_cfi_vals = get_perturbation_cfi_index(X_comp, df)
+np.save(join(output_path, "cirrhotic_weighted_artificial_cfi_vals.npy"),
+        cirrhotic_cfi_vals)
+
+# cirrhotic_cpd_vals = get_cfi(X_all, X_all, pred_fun)
+# np.save(join(output_path, "cirrhotic_weighted_artificial_cpd_vals.npy"),
+#         cirrhotic_cpd_vals)
 
 # %%
