@@ -8,10 +8,12 @@ Note: currently this repository contains code that can reproduce outputs in the 
 
 This folder should contain two subfolders: 
 
-- `MLRepo` which should contain a subfolder `qin2014` ([data source](https://github.com/knights-lab/MLRepo/tree/master/datasets/qin2014))
-- `CentralParkSoil` should contain data pre-processed by `prep_centralparksoil.R` ([data source](https://github.com/jacobbien/trac-reproducible/tree/main/CentralParkSoil/original))
+- `MLRepo` which should contain a subfolder `qin2014` containing data directly taken from [here](https://github.com/knights-lab/MLRepo/tree/master/datasets/qin2014).
+- `CentralParkSoil` should contain data pre-processed by `prep_centralparksoil.R` based on data from [here](https://github.com/jacobbien/trac-reproducible/tree/main/CentralParkSoil/original).
 
 ### `src`
+
+This folder contains most functions to be included in the `KernelBiome` package:
 
 - `metrics_jax.py`: 
 - `kernels_jax.py`: 
@@ -21,8 +23,11 @@ This folder should contain two subfolders:
 - `tree_utils.py`:
 - `cfi.py`:
 - `utils.py`:
+- `simplex_heatmap.py`:
 
 ### `scripts`
+
+This folder contains scripts that can reproduce resutls in the paper:
 
 - `load_<ds>.py`: 
 - `save_cv_indices_<ds>.py`:
@@ -36,5 +41,9 @@ This folder should contain two subfolders:
 
 ### `notebooks`
 
+This folder contains notebooks for demonstration:
+
 - `workflow_demo.ipynb`: 
+- `visualization_writeup.ipynb`:
+
 
