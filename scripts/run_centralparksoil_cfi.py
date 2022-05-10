@@ -55,57 +55,57 @@ w_unifrac_mb = np.load(
 kmat_with_params, weighted_kmat_with_params_ma, weighted_kmat_with_params_mb = setup_params.main(
     X_df, w_unifrac_ma, w_unifrac_mb)
 
-# # %%
-# # 1.1) Unweighed: fit and select top models in each group
-# # ^^^^^^
+# %%
+# 1.1) Unweighed: fit and select top models in each group
+# ^^^^^^
 
-# X_all = X_df.to_numpy().astype('float').T
-# train_scores_all, test_scores_all, selected_params_all = run_experiments(X_all,
-#                                                                          y,
-#                                                                          kmat_with_params,
-#                                                                          param_grid_kr,
-#                                                                          None,
-#                                                                          None,
-#                                                                          center_kmat=True,
-#                                                                          fac_grid=None,
-#                                                                          n_fold_outer=10,
-#                                                                          n_fold_inner=5,
-#                                                                          type='regression',
-#                                                                          scoring='neg_mean_squared_error',
-#                                                                          kernel_estimator='kr',
-#                                                                          n_jobs=-1,
-#                                                                          random_state=seed_num,
-#                                                                          verbose=0)
-# best_models = top_models_in_each_group(
-#     kmat_with_params, train_scores_all, test_scores_all, selected_params_all, top_n=1, kernel_mod_only=True)
-# best_models.to_csv(
-#     join(output_path, f"centralparksoil_unweighted_best_models_{today.strftime('%b-%d-%Y')}.csv"), index=False)
+X_all = X_df.to_numpy().astype('float').T
+train_scores_all, test_scores_all, selected_params_all = run_experiments(X_all,
+                                                                         y,
+                                                                         kmat_with_params,
+                                                                         param_grid_kr,
+                                                                         None,
+                                                                         None,
+                                                                         center_kmat=True,
+                                                                         fac_grid=None,
+                                                                         n_fold_outer=10,
+                                                                         n_fold_inner=5,
+                                                                         type='regression',
+                                                                         scoring='neg_mean_squared_error',
+                                                                         kernel_estimator='kr',
+                                                                         n_jobs=-1,
+                                                                         random_state=seed_num,
+                                                                         verbose=0)
+best_models = top_models_in_each_group(
+    kmat_with_params, train_scores_all, test_scores_all, selected_params_all, top_n=1, kernel_mod_only=True)
+best_models.to_csv(
+    join(output_path, f"centralparksoil_unweighted_best_models_{today.strftime('%b-%d-%Y')}.csv"), index=False)
 
-# # %%
-# # 1.2) Unweighted: refit the best kernel
-# # ^^^^^^
+# %%
+# 1.2) Unweighted: refit the best kernel
+# ^^^^^^
 
-# X_all /= X_all.sum(axis=1)[:, None]
-# model_selected = best_models.iloc[0]
-# print(model_selected)
-# pred_fun, gscv = refit_best_model(X_all, y, 'KernelRidge', param_grid_kr, model_selected,
-#                                   'neg_mean_squared_error', center_kmat=True, n_fold=5, n_jobs=-1, verbose=0)
-# print(gscv.best_estimator_)
+X_all /= X_all.sum(axis=1)[:, None]
+model_selected = best_models.iloc[0]
+print(model_selected)
+pred_fun, gscv = refit_best_model(X_all, y, 'KernelRidge', param_grid_kr, model_selected,
+                                  'neg_mean_squared_error', center_kmat=True, n_fold=5, n_jobs=-1, verbose=0)
+print(gscv.best_estimator_)
 
-# # %%
-# # 1.3) Unweighted: calculate CFI and CPD values
-# # ^^^^^^^
+# %%
+# 1.3) Unweighted: calculate CFI and CPD values
+# ^^^^^^^
 
-# df = df_ke_dual_mat(X_all, X_all, gscv.best_estimator_.dual_coef_, range(
-#     X_all.shape[0]), kernel_args_str_to_k_fun(model_selected.estimator_key))
-# centralparksoil_cfi_vals = get_perturbation_cfi_index(X_all, df)
-# centralparksoil_cpd_vals = get_cfi(X_all, X_all, pred_fun)
+df = df_ke_dual_mat(X_all, X_all, gscv.best_estimator_.dual_coef_, range(
+    X_all.shape[0]), kernel_args_str_to_k_fun(model_selected.estimator_key))
+centralparksoil_cfi_vals = get_perturbation_cfi_index(X_all, df)
+centralparksoil_cpd_vals = get_cfi(X_all, X_all, pred_fun)
 
-# np.save(join(output_path, "centralparksoil_unweighted_cfi_df.npy"), df)
-# np.save(join(output_path, "centralparksoil_unweighted_cfi_vals.npy"),
-#         centralparksoil_cfi_vals)
-# np.save(join(output_path, "centralparksoil_unweighted_cpd_vals.npy"),
-#         centralparksoil_cpd_vals)
+np.save(join(output_path, "centralparksoil_unweighted_cfi_df.npy"), df)
+np.save(join(output_path, "centralparksoil_unweighted_cfi_vals.npy"),
+        centralparksoil_cfi_vals)
+np.save(join(output_path, "centralparksoil_unweighted_cpd_vals.npy"),
+        centralparksoil_cpd_vals)
 
 # %%
 # 2.1) Weighted (MA): fit and select top models in each group
@@ -136,14 +136,18 @@ train_scores_all, test_scores_all, selected_params_all = run_experiments(X_all,
 best_models = top_models_in_each_group(
     weighted_kmat_with_params_ma, train_scores_all, test_scores_all, selected_params_all, top_n=1, kernel_mod_only=True)
 best_models.to_csv(
-    f"centralparksoil_weighted_MA_best_models_{today.strftime('%b-%d-%Y')}.csv", index=False)
+    f"output/centralparksoil_weighted_MA_best_models_{today.strftime('%b-%d-%Y')}.csv", index=False)
 
 # %%
 # 2.2) Weighted (MA): refit the best kernel
 # ^^^^^^
 
 X_all /= X_all.sum(axis=1)[:, None]
-model_selected = best_models.iloc[0]
+# model_selected = best_models.iloc[0]
+model_selected = pd.Series({
+    'estimator_key': 'aitchison_weighted_c_1e-07',
+    'kmat_fun': wrap(kmat_aitchison_weighted, c=1e-07)
+})
 print(model_selected)
 pred_fun, gscv = refit_best_model(X_all, y, 'KernelRidge', param_grid_kr, model_selected,
                                   'neg_mean_squared_error', center_kmat=True, n_fold=5, n_jobs=-1, verbose=0)
@@ -153,28 +157,25 @@ print(gscv.best_estimator_)
 # 2.3) Weighted (MA): calculate CFI and CPD values
 # ^^^^^^^
 
-# Note: comment out for now since it was done and collected, and it takes long time to rerun
-# df = df_ke_dual_mat(X_all, X_all,
-#                     gscv.best_estimator_.dual_coef_,
-#                     range(X_all.shape[0]),
-#                     kernel_args_str_to_k_fun(model_selected.estimator_key,
-#                                              weighted=True,
-#                                              w_mat=w_unifrac_ma))
-# np.save(join(output_path, "centralparksoil_weighted_MA_cfi_df.npy"), df)
+df = df_ke_dual_mat(X_all, X_all,
+                    gscv.best_estimator_.dual_coef_,
+                    range(X_all.shape[0]),
+                    kernel_args_str_to_k_fun(model_selected.estimator_key,
+                                             weighted=True,
+                                             w_mat=w_unifrac_ma))
+np.save(join(output_path, "centralparksoil_weighted_MA_cfi_df.npy"), df)
 
-# centralparksoil_cfi_vals = get_perturbation_cfi_index(X_all, df)
-# np.save(join(output_path, "centralparksoil_weighted_MA_cfi_vals.npy"),
-#         centralparksoil_cfi_vals)
+centralparksoil_cfi_vals = get_perturbation_cfi_index(X_all, df)
+np.save(join(output_path, "centralparksoil_weighted_MA_cfi_vals.npy"),
+        centralparksoil_cfi_vals)
 
 # only calculate the top 10 species according to weighted CFI to save time
 centralparksoil_ma_cfi_vals = np.load(
-    "output/centralparksoil_weighted_MA_cfi_vals.npy")
+    join(output_path, "centralparksoil_weighted_MA_cfi_vals.npy"))
 selected_comp = np.argsort(-np.abs(centralparksoil_ma_cfi_vals))[:10]
 
-supp_grid = get_supp_grid(X_all[:, selected_comp], n_grid=20)
+supp_grid = get_supp_grid(X_all, n_grid=20)
 centralparksoil_cpd_vals = get_cfi(
-    X_all[:, selected_comp], supp_grid, pred_fun)
+    X_all, supp_grid, pred_fun, selected_comp, verbose=True)
 np.save(join(output_path, "centralparksoil_weighted_MA_cpd_vals.npy"),
         centralparksoil_cpd_vals)
-
-# qsub -W group_list=ku_00126 -A ku_00126 -l nodes=1:ppn=40,mem=185gb,walltime=54000 run_job_centralparksoil.sh

@@ -64,7 +64,7 @@ def get_supp_grid(X, n_grid):
 # ---- CFI calculations (do-intervention approach) ----
 
 
-def get_cfi(X, supp_grid, pred_fun, rescale=True, verbose=False):
+def get_cfi(X, supp_grid, pred_fun, comp_idx=None, rescale=True, verbose=False):
     """
     Calculate CFI vales for a kernel based or non-kernel based function.
 
@@ -75,15 +75,21 @@ def get_cfi(X, supp_grid, pred_fun, rescale=True, verbose=False):
     """
     assert(X.shape[1] == supp_grid.shape[1])
     n, p = X.shape
+    comp_idx = range(p) if comp_idx is None else comp_idx
     n_grid = supp_grid.shape[0]
-    cfi_vals = np.zeros((p, n_grid))
-    for jj in range(p):
+    cfi_vals = np.zeros((len(comp_idx), n_grid))
+    # for jj in range(p):
+    for jj, idx in enumerate(comp_idx):
         if verbose:
-            print(f'jj: {jj}')
+            print(f'-- jj: {jj}: comp {idx} --')
         for ii in range(n):
+            if verbose and ii % 10 == 0:
+                print(f'  ii: {ii}')
             G = np.repeat(X[ii][None, :], n_grid, axis=0)
-            G[:, jj] = supp_grid[:, jj].copy()
-            G = C_partial(G, jj) if rescale else G
+            # G[:, jj] = supp_grid[:, jj].copy()
+            G[:, idx] = supp_grid[:, idx].copy()
+            # G = C_partial(G, jj) if rescale else G
+            G = C_partial(G, idx) if rescale else G
             cfi_vals[jj] += pred_fun(G)
     cfi_vals /= n
     cfi_vals -= np.mean(pred_fun(X))
