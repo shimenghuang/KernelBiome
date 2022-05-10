@@ -13,7 +13,6 @@ import pandas as pd
 from src.cfi import *
 import load_cirrhotic
 
-
 seed_num = 2022
 
 rc('font', **{'family': 'tex-gyre-termes', 'size': 6.5})
