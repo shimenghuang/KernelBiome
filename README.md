@@ -1,6 +1,6 @@
 # KernelBiome
 
-Note: currently this repository contains code that can reproduce outputs in the paper [TODO: add link]. The `KernelBiome` python package is working-in-progress.
+Note: currently this repository contains code that can reproduce outputs in the paper [TODO: add link]. The `KernelBiome` python package will be available in the upcoming two weeks.
 
 ## Current Content
 
@@ -43,7 +43,7 @@ This folder contains scripts that can reproduce resutls in the paper:
 
 This folder contains notebooks for demonstration:
 
-- `workflow_demo.ipynb`: 
-- `visualization_writeup.ipynb`:
+- `workflow_demo.ipynb`: A workflow demonstration using simulated data.
+- `visualization_writeup.ipynb`: Visualization of kernels with heatmap on 2-simplex.
 
 
