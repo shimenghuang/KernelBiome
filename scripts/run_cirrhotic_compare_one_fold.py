@@ -2,11 +2,6 @@
 # load libs
 # ^^^^^^
 
-from sklearn.linear_model import LogisticRegression
-from sklearn.svm import SVC
-from sklearn.dummy import DummyClassifier
-from sklearn.ensemble import RandomForestClassifier
-from classo import classo_problem
 import sys  # nopep8
 sys.path.insert(0, "../")  # nopep8
 
@@ -15,6 +10,7 @@ import numpy as np
 from src.helpers_jax import *
 from src.utils import *
 import load_cirrhotic
+import cirrhotic_inner_fold
 
 on_computerome = True
 fold_idx = int(sys.argv[1])
@@ -81,6 +77,8 @@ print(g2)
 
 param_grid_lr = dict(C=[10**x for x in [-3, -2, -1, 0, 1, 2, 3]])
 print(param_grid_lr)
+param_grid_svc_rbf = dict(
+    C=[0.001, 0.01, 0.1, 1, 10, 100, 1000], gamma=get_rbf_bandwidth(g1))
 param_grid_svm = dict(C=[10**x for x in [-3, -2, -1, 0, 1, 2, 3]])
 print(param_grid_svm)
 param_grid_kr = dict(alpha=list(np.logspace(-7, 1, 5, base=2)))
@@ -135,8 +133,13 @@ comparison_cv_idx = np.load(
 tr = comparison_cv_idx['tr_list'][fold_idx]
 te = comparison_cv_idx['te_list'][fold_idx]
 
-exec(open(join(file_dir, "run_cirrhotic_server_main_part1.py")).read())
-exec(open(join(file_dir, "run_cirrhotic_server_main_part2.py")).read())
+test_score_baseline, test_score_svc, test_score_lr, test_score_classo, test_score_rf = cirrhotic_inner_fold.cirrhotic_one_fold_part1(
+    X_df, X, y, label, tr, te, param_grid_lr, param_grid_svc_rbf, param_grid_rf)
+test_score_kb, test_score_wkb_ma, test_score_wkb_mb = cirrhotic_inner_fold.cirrhotic_one_fold_part2(
+    X_df, y, tr, te,
+    mod_with_params, weighted_kmat_with_params_ma, weighted_kmat_with_params_mb,
+    param_grid_svm, param_grid_rf, param_grid_baseline,
+    do_save, do_save_file, do_save_file_weighted_ma, do_save_file_weighted_mb)
 
 scores_series = pd.Series({
     'baseline': test_score_baseline,
@@ -150,6 +153,6 @@ scores_series = pd.Series({
 })
 
 scores_series.to_csv(
-    f"cirrhotic_classo_{pseudo_count}_prescreen_manual_beta0_{beta0}_beta1_{beta1}_fold_{fold_idx}.csv", index=False)
+    f"cirrhotic_classo_{pseudo_count}_prescreen_manual_fold_{fold_idx}.csv", index=False)
 
 # %%

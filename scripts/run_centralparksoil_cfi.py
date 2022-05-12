@@ -144,9 +144,10 @@ best_models.to_csv(
 
 X_all /= X_all.sum(axis=1)[:, None]
 # model_selected = best_models.iloc[0]
+# aitchison-rbf_weighted_c_0.001_g_0.00116899264
 model_selected = pd.Series({
-    'estimator_key': 'aitchison_weighted_c_1e-07',
-    'kmat_fun': wrap(kmat_aitchison_weighted, c=1e-07)
+    'estimator_key': 'aitchison-rbf_weighted_c_0.001_g_0.00116899264',
+    'kmat_fun': wrap(kmat_aitchison_rbf_weighted, c=0.001, g=0.00116899264, w=w_unifrac_ma)
 })
 print(model_selected)
 pred_fun, gscv = refit_best_model(X_all, y, 'KernelRidge', param_grid_kr, model_selected,
@@ -179,3 +180,5 @@ centralparksoil_cpd_vals = get_cfi(
     X_all, supp_grid, pred_fun, selected_comp, verbose=True)
 np.save(join(output_path, "centralparksoil_weighted_MA_cpd_vals.npy"),
         centralparksoil_cpd_vals)
+
+# %%

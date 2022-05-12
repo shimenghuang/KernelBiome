@@ -100,18 +100,18 @@ supp_grid = get_supp_grid(X_all, n_grid=20)
 plot_cfi(supp_grid[:, selected_comp_weighted], centralparksoil_ma_cpd_vals,
          labels=abbr_label, colors=colors_all[::2], axs=axs[0], xlabel='Relative abundance')
 # axs[0].set_xlim((0,0.05))
-axs[0].annotate('131', (0.05, 0.02))
-axs[0].annotate('38', (0.065, 0.065))
-axs[0].annotate('62', (0.22, -0.12))
+axs[0].annotate('131', (0.015, 0.13))
+axs[0].annotate('38', (0.04, 0.15))
+axs[0].annotate('62', (0.22, -0.15))
 axs[0].annotate('46', (0.04, -0.08))
-axs[0].annotate('227', (0.05, -0.095))
-axs[0].annotate('117', (0.03, -0.11))
-axs[0].annotate('122', (0.03, -0.01))
-axs[0].annotate('95', (0.065, 0.085))
-axs[0].annotate('SCA1145', (0.13, -0.035))
+axs[0].annotate('227', (0.05, -0.15))
+axs[0].annotate('117', (0.03, -0.10))
+axs[0].annotate('122', (0.02, -0.11))
+axs[0].annotate('95', (0.05, 0.10))
+axs[0].annotate('SCA1145', (0.13, -0.08))
 axs[0].annotate('47', (0.1, -0.06))
 
-plot_cfi_index(centralparksoil_ma_cfi_vals[selected_comp_weighted], fmt='%.2f',
+plot_cfi_index(centralparksoil_ma_cfi_vals[selected_comp_weighted], fmt='%.3f',
                labels=abbr_label, colors=colors_all[::2], axs=axs[1], ascending=False)
 fig.set_size_inches(3.2, 2.5)
 fig.savefig('output/centralparksoil_weighted_MA_cpd_and_cfi_top10.pdf',
