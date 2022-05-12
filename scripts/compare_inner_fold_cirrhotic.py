@@ -11,7 +11,7 @@ from classo import classo_problem
 from src.utils import *
 
 
-def cirrhotic_one_fold_part1(X_df, X, y, label, tr, te, param_grid_lr, param_grid_svc_rbf, param_grid_rf):
+def one_fold_part1(X_df, X, y, label, tr, te, param_grid_lr, param_grid_svc_rbf, param_grid_rf):
 
     X_tr = X_df.to_numpy().astype('float').T[tr]
     X_tr /= X_tr.sum(axis=1)[:, None]
@@ -88,10 +88,10 @@ def cirrhotic_one_fold_part1(X_df, X, y, label, tr, te, param_grid_lr, param_gri
     return test_score_baseline, test_score_svc, test_score_lr, test_score_classo, test_score_rf
 
 
-def cirrhotic_one_fold_part2(X_df, y, tr, te,
-                             mod_with_params, weighted_kmat_with_params_ma, weighted_kmat_with_params_mb,
-                             param_grid_svm, param_grid_rf, param_grid_baseline,
-                             do_save, do_save_file, do_save_file_weighted_ma, do_save_file_weighted_mb):
+def one_fold_part2(X_df, y, tr, te,
+                   mod_with_params, weighted_kmat_with_params_ma, weighted_kmat_with_params_mb,
+                   param_grid_svm, param_grid_rf, param_grid_baseline,
+                   do_save, do_save_file, do_save_file_weighted_ma, do_save_file_weighted_mb):
 
     X_tr = X_df.to_numpy().astype('float').T[tr]
     X_tr /= X_tr.sum(axis=1)[:, None]

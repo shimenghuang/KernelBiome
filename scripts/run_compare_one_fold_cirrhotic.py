@@ -10,7 +10,7 @@ import numpy as np
 from src.helpers_jax import *
 from src.utils import *
 import load_cirrhotic
-import cirrhotic_inner_fold
+import compare_inner_fold_cirrhotic
 
 on_computerome = True
 fold_idx = int(sys.argv[1])
@@ -107,7 +107,6 @@ weighted_kernel_params_dict_ma = default_weighted_kernel_params_grid(
     w_unifrac_ma, g1, g2)
 weighted_kmat_with_params_ma = get_weighted_kmat_with_params(
     weighted_kernel_params_dict_ma, w_unifrac=w_unifrac_ma)
-weighted_mod_with_params_ma = weighted_kmat_with_params_ma
 
 # UniFrac weight with MB
 w_unifrac_mb = np.load(
@@ -116,7 +115,6 @@ weighted_kernel_params_dict_mb = default_weighted_kernel_params_grid(
     w_unifrac_mb, g1, g2)
 weighted_kmat_with_params_mb = get_weighted_kmat_with_params(
     weighted_kernel_params_dict_mb, w_unifrac=w_unifrac_mb)
-weighted_mod_with_params_mb = weighted_kmat_with_params_mb
 
 # %%
 # load CV indices
@@ -133,9 +131,9 @@ comparison_cv_idx = np.load(
 tr = comparison_cv_idx['tr_list'][fold_idx]
 te = comparison_cv_idx['te_list'][fold_idx]
 
-test_score_baseline, test_score_svc, test_score_lr, test_score_classo, test_score_rf = cirrhotic_inner_fold.cirrhotic_one_fold_part1(
+test_score_baseline, test_score_svc, test_score_lr, test_score_classo, test_score_rf = compare_inner_fold_cirrhotic.one_fold_part1(
     X_df, X, y, label, tr, te, param_grid_lr, param_grid_svc_rbf, param_grid_rf)
-test_score_kb, test_score_wkb_ma, test_score_wkb_mb = cirrhotic_inner_fold.cirrhotic_one_fold_part2(
+test_score_kb, test_score_wkb_ma, test_score_wkb_mb = compare_inner_fold_cirrhotic.one_fold_part2(
     X_df, y, tr, te,
     mod_with_params, weighted_kmat_with_params_ma, weighted_kmat_with_params_mb,
     param_grid_svm, param_grid_rf, param_grid_baseline,

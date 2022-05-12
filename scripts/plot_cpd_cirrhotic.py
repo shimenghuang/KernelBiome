@@ -7,7 +7,6 @@ sys.path.insert(0, "../")  # nopep8
 
 from matplotlib import rc
 import matplotlib.pyplot as plt
-from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
 import numpy as np
 import pandas as pd
 from src.cfi import *
