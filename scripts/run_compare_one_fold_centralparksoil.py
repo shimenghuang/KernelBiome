@@ -27,10 +27,10 @@ seed_num = 2022
 
 # input and output paths
 if on_computerome:
-    data_path = "KernelBiome/data/MLRepo/qin2014"
+    data_path = "KernelBiome/data/CentralParkSoil"
     output_path = "KernelBiome/scripts/output"
 else:
-    data_path = "/Users/hrt620/Documents/projects/kernelbiome_proj/kernelbiome_clean/data/MLRepo/qin2014"
+    data_path = "/Users/hrt620/Documents/projects/kernelbiome_proj/kernelbiome_clean/data/CentralParkSoil"
     output_path = "/Users/hrt620/Documents/projects/kernelbiome_proj/kernelbiome_clean/scripts/output"
 
 # intermediate results
@@ -82,6 +82,9 @@ print(g2)
 
 param_grid_lasso = dict(alpha=[10**x for x in [-5, -4, -3, -2, -1]])
 print(param_grid_lasso)
+param_grid_svr_rbf = dict(
+    C=[0.001, 0.01, 0.1, 1, 10, 100, 1000], gamma=get_rbf_bandwidth(g1))
+print(param_grid_svr_rbf)
 param_grid_svm = dict(C=[10**x for x in [-3, -2, -1, 0, 1, 2, 3]])
 print(param_grid_svm)
 param_grid_kr = dict(alpha=list(np.logspace(-7, 1, 5, base=2)))
@@ -136,7 +139,7 @@ weighted_mod_with_params_psd = weighted_kmat_with_params_psd
 
 n_compare = 50
 comparison_cv_idx = np.load(
-    join(output_path, f"output/centralparksoil_compare_{n_compare}cv_idx.npz"), allow_pickle=True)
+    join(output_path, f"centralparksoil_compare_{n_compare}cv_idx.npz"), allow_pickle=True)
 
 # %%
 # run a comparison CV fold
@@ -146,7 +149,7 @@ tr = comparison_cv_idx['tr_list'][fold_idx]
 te = comparison_cv_idx['te_list'][fold_idx]
 
 test_score_baseline, test_score_svr, test_score_lasso, test_score_classo, test_score_rf = compare_inner_fold_centralparksoil.one_fold_part1(
-    X_df, X, y, label, tr, te, param_grid_lasso, param_grid_kr, param_grid_rf)
+    X_df, X, y, label, tr, te, param_grid_baseline, param_grid_lasso, param_grid_svr_rbf, param_grid_rf)
 test_score_kb, test_score_wkb_ma, test_score_wkb_mb = compare_inner_fold_centralparksoil.one_fold_part2(
     X_df, y, tr, te,
     mod_with_params, weighted_kmat_with_params_ma, weighted_kmat_with_params_mb,
@@ -166,3 +169,5 @@ scores_series = pd.Series({
 
 scores_series.to_csv(
     f"centralparksoil_classo_{pseudo_count}_prescreen_manual_fold_{fold_idx}.csv", index=False)
+
+# %%

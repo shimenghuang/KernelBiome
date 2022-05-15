@@ -83,6 +83,7 @@ param_grid_lr = dict(C=[10**x for x in [-3, -2, -1, 0, 1, 2, 3]])
 print(param_grid_lr)
 param_grid_svc_rbf = dict(
     C=[0.001, 0.01, 0.1, 1, 10, 100, 1000], gamma=get_rbf_bandwidth(g1))
+print(param_grid_svc_rbf)
 param_grid_svm = dict(C=[10**x for x in [-3, -2, -1, 0, 1, 2, 3]])
 print(param_grid_svm)
 param_grid_kr = dict(alpha=list(np.logspace(-7, 1, 5, base=2)))
@@ -126,7 +127,7 @@ weighted_kmat_with_params_mb = get_weighted_kmat_with_params(
 
 n_compare = 50
 comparison_cv_idx = np.load(
-    join(output_path, f"output/cirrhotic_compare_{n_compare}cv_idx.npz"), allow_pickle=True)
+    join(output_path, f"cirrhotic_compare_{n_compare}cv_idx.npz"), allow_pickle=True)
 
 # %%
 # run a comparison CV fold

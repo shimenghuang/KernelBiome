@@ -24,7 +24,7 @@ def one_fold_part1(X_df, X, y, label, tr, te, param_grid_baseline, param_grid_la
     """
     estimator = DummyRegressor()
     gscv = GridSearchCV(estimator=estimator, param_grid=param_grid_baseline, cv=5,
-                        scoring="neg_mean_squared_error", n_jons=-1, verbose=0)
+                        scoring="neg_mean_squared_error", n_jobs=-1, verbose=0)
     gscv.fit(X_tr, y[tr])
     yhat = gscv.predict(X_te)
     test_score_baseline = np.mean((yhat-y[te])**2)
@@ -35,7 +35,7 @@ def one_fold_part1(X_df, X, y, label, tr, te, param_grid_baseline, param_grid_la
     """
     estimator = SVR()
     gscv = GridSearchCV(estimator=estimator, param_grid=param_grid_svr_rbf, cv=5,
-                        scoring="neg_mean_squared_error", n_jons=-1, verbose=0)
+                        scoring="neg_mean_squared_error", n_jobs=-1, verbose=0)
     gscv.fit(X_tr, y[tr])
     print(gscv.best_estimator_)
     yhat = gscv.predict(X_te)
@@ -47,7 +47,7 @@ def one_fold_part1(X_df, X, y, label, tr, te, param_grid_baseline, param_grid_la
     """
     estimator = Lasso(random_state=2022)
     gscv = GridSearchCV(estimator=estimator, param_grid=param_grid_lasso, cv=5,
-                        scoring="neg_mean_squared_error", n_jons=-1, verbose=0)
+                        scoring="neg_mean_squared_error", n_jobs=-1, verbose=0)
     gscv.fit(X_tr, y[tr])
     print(gscv.best_estimator_)
     yhat = gscv.predict(X_te)
@@ -77,7 +77,7 @@ def one_fold_part1(X_df, X, y, label, tr, te, param_grid_baseline, param_grid_la
     """
     estimator = RandomForestRegressor(max_depth=np.sqrt(X.shape[0]))
     gscv = GridSearchCV(estimator=estimator, param_grid=param_grid_rf, cv=5,
-                        scoring='neg_mean_squared_error', n_jons=-1, verbose=0)
+                        scoring='neg_mean_squared_error', n_jobs=-1, verbose=0)
     gscv.fit(X_tr, y[tr])
     test_score_rf = np.mean((gscv.predict(X_te)-y[te])**2)
     print(f"* Done rf: {test_score_rf}.")
