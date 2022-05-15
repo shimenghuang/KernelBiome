@@ -1,8 +1,5 @@
-# from cProfile import label
-from matplotlib.pyplot import axis
-from numpy.linalg import matrix_rank, cond, eigvals
+from numpy.linalg import matrix_rank, eigvals
 from numpy.core import finfo
-from pickle import TRUE
 import pandas as pd
 import numpy as np
 import numpy.linalg as la
@@ -10,7 +7,6 @@ from sklearn import svm
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import KFold, StratifiedKFold
 from sklearn.preprocessing import KernelCenterer
-# import matplotlib.pyplot as plt
 import pickle
 from collections import Counter
 import warnings

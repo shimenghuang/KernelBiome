@@ -14,8 +14,8 @@ from os.path import join
 import numpy as np
 from src.helpers_jax import *
 from src.utils import *
-import load_cirrhotic
-import compare_inner_fold_cirrhotic
+import load_centralparksoil
+import compare_inner_fold_centralparksoil
 
 fold_idx = int(sys.argv[1])
 print(f"fold: {fold_idx}")
@@ -27,8 +27,8 @@ seed_num = 2022
 
 # input and output paths
 if on_computerome:
-    data_path = "kernelbiome_clean/data/MLRepo/qin2014"
-    output_path = "kernelbiome_clean/scripts/output"
+    data_path = "KernelBiome/data/MLRepo/qin2014"
+    output_path = "KernelBiome/scripts/output"
 else:
     data_path = "/Users/hrt620/Documents/projects/kernelbiome_proj/kernelbiome_clean/data/MLRepo/qin2014"
     output_path = "/Users/hrt620/Documents/projects/kernelbiome_proj/kernelbiome_clean/scripts/output"
@@ -36,18 +36,19 @@ else:
 # intermediate results
 do_save = True
 do_save_file = join(
-    output_path, f"cirrhotic_res_kb_fold_{fold_idx}.pickle")
+    output_path, f"centralparksoil_res_kb_fold_{fold_idx}.pickle")
 do_save_file_weighted_ma = join(
-    output_path, f"cirrhotic_res_MA_kb_fold_{fold_idx}.pickle")
+    output_path, f"centralparksoil_res_MA_kb_fold_{fold_idx}.pickle")
 do_save_file_weighted_mb = join(
-    output_path, f"cirrhotic_res_MB_kb_fold_{fold_idx}.pickle")
+    output_path, f"centralparksoil_res_MB_kb_fold_{fold_idx}.pickle")
 
 # %%
 # call prep script
 # ^^^^^^
 
 # data to be used for most of the methods
-X_df, y, label = load_cirrhotic.main(data_path=data_path, seed_num=seed_num)
+X_df, y, label = load_centralparksoil.main(
+    data_path=data_path, seed_num=seed_num)
 
 # data to be used for classo (with added pseudo count)
 pseudo_count = 1
@@ -79,10 +80,8 @@ print(g2)
 # setup hyperparameter search grid
 # ^^^^^^
 
-param_grid_lr = dict(C=[10**x for x in [-3, -2, -1, 0, 1, 2, 3]])
-print(param_grid_lr)
-param_grid_svc_rbf = dict(
-    C=[0.001, 0.01, 0.1, 1, 10, 100, 1000], gamma=get_rbf_bandwidth(g1))
+param_grid_lasso = dict(alpha=[10**x for x in [-5, -4, -3, -2, -1]])
+print(param_grid_lasso)
 param_grid_svm = dict(C=[10**x for x in [-3, -2, -1, 0, 1, 2, 3]])
 print(param_grid_svm)
 param_grid_kr = dict(alpha=list(np.logspace(-7, 1, 5, base=2)))
@@ -91,10 +90,6 @@ param_grid_rf = dict(n_estimators=[10, 20, 50, 100, 250, 500])
 print(param_grid_rf)
 param_grid_baseline = dict(strategy=["mean", "median"])
 print(param_grid_baseline)
-
-# %%
-# setup for KB estimator
-# ^^^^^^
 
 kernel_params_dict = default_kernel_params_grid()
 kmat_with_params = get_kmat_with_params(kernel_params_dict)
@@ -106,7 +101,7 @@ mod_with_params = kmat_with_params
 
 # UniFrac weight with MA
 w_unifrac_ma = np.load(
-    join(output_path, "cirrhotic_w_unifrac_MA.npy"), allow_pickle=True)
+    join(output_path, "centralparksoil_w_unifrac_MA.npy"), allow_pickle=True)
 weighted_kernel_params_dict_ma = default_weighted_kernel_params_grid(
     w_unifrac_ma, g1, g2)
 weighted_kmat_with_params_ma = get_weighted_kmat_with_params(
@@ -114,11 +109,26 @@ weighted_kmat_with_params_ma = get_weighted_kmat_with_params(
 
 # UniFrac weight with MB
 w_unifrac_mb = np.load(
-    join(output_path, "cirrhotic_w_unifrac_MB.npy"), allow_pickle=True)
+    join(output_path, "centralparksoil_w_unifrac_MB.npy"), allow_pickle=True)
 weighted_kernel_params_dict_mb = default_weighted_kernel_params_grid(
     w_unifrac_mb, g1, g2)
 weighted_kmat_with_params_mb = get_weighted_kmat_with_params(
     weighted_kernel_params_dict_mb, w_unifrac=w_unifrac_mb)
+
+
+# original unifrac weights
+weighted_kernel_params_dict_orig = default_weighted_kernel_params_grid(
+    w_unifrac_ma)
+weighted_kmat_with_params_orig = get_weighted_kmat_with_params(
+    weighted_kernel_params_dict_orig, w_unifrac=w_unifrac_ma)
+weighted_mod_with_params_orig = weighted_kmat_with_params_orig
+
+# psd-ed unifrac weights
+weighted_kernel_params_dict_psd = default_weighted_kernel_params_grid(
+    w_unifrac_mb)
+weighted_kmat_with_params_psd = get_weighted_kmat_with_params(
+    weighted_kernel_params_dict_psd, w_unifrac=w_unifrac_mb)
+weighted_mod_with_params_psd = weighted_kmat_with_params_psd
 
 # %%
 # load CV indices
@@ -126,7 +136,7 @@ weighted_kmat_with_params_mb = get_weighted_kmat_with_params(
 
 n_compare = 50
 comparison_cv_idx = np.load(
-    join(output_path, f"output/cirrhotic_compare_{n_compare}cv_idx.npz"), allow_pickle=True)
+    join(output_path, f"output/centralparksoil_compare_{n_compare}cv_idx.npz"), allow_pickle=True)
 
 # %%
 # run a comparison CV fold
@@ -135,9 +145,9 @@ comparison_cv_idx = np.load(
 tr = comparison_cv_idx['tr_list'][fold_idx]
 te = comparison_cv_idx['te_list'][fold_idx]
 
-test_score_baseline, test_score_svc, test_score_lr, test_score_classo, test_score_rf = compare_inner_fold_cirrhotic.one_fold_part1(
-    X_df, X, y, label, tr, te, param_grid_lr, param_grid_svc_rbf, param_grid_rf)
-test_score_kb, test_score_wkb_ma, test_score_wkb_mb = compare_inner_fold_cirrhotic.one_fold_part2(
+test_score_baseline, test_score_svr, test_score_lasso, test_score_classo, test_score_rf = compare_inner_fold_centralparksoil.one_fold_part1(
+    X_df, X, y, label, tr, te, param_grid_lasso, param_grid_kr, param_grid_rf)
+test_score_kb, test_score_wkb_ma, test_score_wkb_mb = compare_inner_fold_centralparksoil.one_fold_part2(
     X_df, y, tr, te,
     mod_with_params, weighted_kmat_with_params_ma, weighted_kmat_with_params_mb,
     param_grid_svm, param_grid_rf, param_grid_baseline,
@@ -145,8 +155,8 @@ test_score_kb, test_score_wkb_ma, test_score_wkb_mb = compare_inner_fold_cirrhot
 
 scores_series = pd.Series({
     'baseline': test_score_baseline,
-    'SVC(RBF)': test_score_svc,
-    'Logistic': test_score_lr,
+    'SVR(RBF)': test_score_svr,
+    'Lasso': test_score_lasso,
     'classo': test_score_classo,
     'RF': test_score_rf,
     'KernelBiome': test_score_kb,
@@ -155,6 +165,4 @@ scores_series = pd.Series({
 })
 
 scores_series.to_csv(
-    f"cirrhotic_classo_{pseudo_count}_prescreen_manual_fold_{fold_idx}.csv", index=False)
-
-# %%
+    f"centralparksoil_classo_{pseudo_count}_prescreen_manual_fold_{fold_idx}.csv", index=False)

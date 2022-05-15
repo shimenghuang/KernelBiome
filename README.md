@@ -1,6 +1,6 @@
 # KernelBiome
 
-Note: currently this repository contains code that can reproduce outputs in the paper [TODO: add link]. The `KernelBiome` python package will be available in the upcoming two weeks.
+Note: currently this repository contains code that can reproduce outputs in the paper [TODO: add link]. The `KernelBiome` python package will be available within the upcoming two weeks.
 
 ## Current Content
 

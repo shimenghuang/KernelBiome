@@ -99,7 +99,7 @@ axs[0].set_xlabel('CFI')
 axs[0].legend(bbox_to_anchor=(-0.05, 1.05, 1.1, .1),
               loc='lower left', handletextpad=0.2,
               ncol=2, mode="expand", borderaxespad=0.1,
-              prop={'size': 4})
+              prop={'size': 5.5})
 
 # for ii in [0, 10, 9, 19]:
 #     patch = axs[0].patches[ii]
@@ -130,7 +130,7 @@ axs[1].set_yticklabels([
 ], ha='center')
 axs[1].tick_params(axis='y', which='major', pad=17)
 axs[1].invert_yaxis()
-axs[1].set_title('KernelBiome-UF', fontsize=4)
+axs[1].set_title('KernelBiome-UF', fontsize=6.5)
 axs[1].set_xlabel('CFI')
 axs[1].set_ylabel('')
 
@@ -142,7 +142,7 @@ cfi_gi_df.plot(
 axs[2].invert_yaxis()
 axs[2].set_yticklabels([])
 axs[2].tick_params(left=False)
-axs[2].set_title('RF', fontsize=4)
+axs[2].set_title('RF', fontsize=6.5)
 axs[2].set_xlabel('Gini-Imp')
 axs[2].set_ylabel('')
 
@@ -162,7 +162,7 @@ for spine in axs[1].spines.values():
 for spine in axs[2].spines.values():
     spine.set(color='gray', linewidth=2, alpha=0.2)
 plt.style.use("seaborn-white")
-fig.set_size_inches(3.2, 1.35)
+fig.set_size_inches(4, 1.9)
 fig.savefig("output/cirrhotic_cfi_and_gi.pdf",
             bbox_inches='tight')
 
