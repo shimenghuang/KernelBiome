@@ -1,18 +1,10 @@
-# from typing import Optional, Callable, Dict
 from functools import partial
-
 import jax.numpy as jnp
 from jax import jit
-from src.helpers_jax import gmean, gram
+from helpers_jax import gmean, gram
 
+# ---- kernel functions on vectors ----
 
-# ------------------------------------------------------------------------------
-# --------------------------------- Linear Kernel ------------------------------
-# def k_linear_weighted(x, y, w):
-#    # inv_p = 1.0/shape[0]
-#    p = x.shape[0]
-#    mat = w * (x[..., jnp.newaxis]@y[..., jnp.newaxis].T - 1/p**2)
-#    return mat.sum()
 
 @jit
 def k_linear_weighted(x, y, w):
@@ -22,12 +14,6 @@ def k_linear_weighted(x, y, w):
     return mat.sum()
 
 
-def kmat_linear_weighted(X, Y, w):
-    return gram(k_linear_weighted, X, Y, w=w)
-
-
-# ------------------------------------------------------------------------------
-# --------------------------------- RBF Kernel ---------------------------------
 @partial(jit, static_argnames=('g'), inline=True)
 def k_rbf_weighted(x, y, g, w):
     mesh = jnp.stack(jnp.meshgrid(x, y))
@@ -38,12 +24,6 @@ def k_rbf_weighted(x, y, g, w):
     return jnp.exp(vec)
 
 
-def kmat_rbf_weighted(X, Y, g, w):
-    return gram(k_rbf_weighted, X, Y, g=g, w=w)
-
-
-# ------------------------------------------------------------------------------
-# ----------------------------- Heat Diffusion Kernel --------------------------
 @partial(jit, static_argnames=('t'), inline=True)
 def k_hd_weighted(x, y, t, w):
     p = x.shape[0]
@@ -55,12 +35,6 @@ def k_hd_weighted(x, y, t, w):
     return fac*t1
 
 
-def kmat_hd_weighted(X, Y, t, w):
-    return gram(k_hd_weighted, X, Y, t=t, w=w)
-
-
-# ------------------------------------------------------------------------------
-# -------------------------- Aitchison Linear Kernel ---------------------------
 @partial(jit, static_argnames=('c'), inline=True)
 def k_aitchison_weighted(x, y, c, w):
     x = x + c
@@ -81,12 +55,6 @@ def k_aitchison_weighted(x, y, c, w):
     return jnp.sum(w * (clr_x * clr_y))
 
 
-def kmat_aitchison_weighted(x, y, c, w):
-    return gram(k_aitchison_weighted, x, y, c=c, w=w)
-
-
-# ------------------------------------------------------------------------------
-# --------------------------- Aitchison RBF Kernel -----------------------------
 @partial(jit, static_argnames=('g', 'c'), inline=True)
 def k_aitchison_rbf_weighted(x, y, g, c, w):
     x = x + c
@@ -107,13 +75,6 @@ def k_aitchison_rbf_weighted(x, y, g, c, w):
     k *= -g
 
     return jnp.exp(k)
-
-
-def kmat_aitchison_rbf_weighted(x, y, g, c, w):
-    return gram(k_aitchison_rbf_weighted, x, y, g=g, c=c, w=w)
-
-# ------------------------------------------------------------------------------
-# --------------------------------- HILBERTIAN 1 -------------------------------
 
 
 @jit
@@ -218,31 +179,6 @@ def k_hilbert1_weighted(x, y, a, b, w):
         return k_hilbert1_ab_weighted(x, y, a=a, b=b, w=w)
 
 
-def kmat_hilbert1_weighted(X, Y, a, b, w):
-    # print(f'a = {a}')
-    # print(f'b = {b}')
-    assert(a >= 1)
-    assert(b >= 0.5 and b <= a)
-    if jnp.isinf(a) and a == b:
-        # Note: jnp.inf == jnp.inf is True
-        return gram(k_hilbert1_b_inf_weighted, X, Y, w=w)
-    elif not jnp.isinf(a) and a == b:
-        return gram(k_hilbert1_b_fin_weighted, X, Y, b=a, w=w)
-    # TODO : check the case of a=infty and b=1 is still caught in the clause below
-    # elif jnp.isinf(a) and b == 1:
-    #    return 2*kmat_tv_weighted(X, Y, w=w)
-    elif jnp.isinf(a) and not jnp.isinf(b):
-        # Note: with a = inf and b = 1, should be the same as 2*kmat_tv(X,Y)
-        #  but kmat_tv should be faster
-        return gram(k_hilbert1_a_inf_b_fin_weighted, X, Y, b=b, w=w)
-    else:
-        # print("diff a b case")
-        return gram(k_hilbert1_ab_weighted, X, Y, a=a, b=b, w=w)
-
-# ------------------------------------------------------------------------------
-# --------------------------------- HILBERTIAN 2 -------------------------------
-
-
 @partial(jit, static_argnames=('b'), inline=True)
 def k_hilbert2_a_inf_b_fin_weighted(x, y, b, w):
     inv_p = 1.0 / x.shape[0]
@@ -315,52 +251,6 @@ def k_hilbert2_weighted(x, y, a, b, w):
         return k_hilbert2_ab_weighted(x, y, a=a, b=b, w=w)
 
 
-def kmat_hilbert2_weighted(X, Y, a, b, w):
-    assert(a >= 1)
-    assert(b <= -1)
-    # cannot both be inf (TODO: double check?)
-    assert(not jnp.isinf(a) or not jnp.isinf(b))
-    if jnp.isinf(a) and not jnp.isinf(b):
-        return gram(k_hilbert2_a_inf_b_fin_weighted, X, Y, b=b, w=w)
-    elif not jnp.isinf(a) and jnp.isinf(b):
-        return gram(k_hilbert2_a_fin_b_neginf_weighted, X, Y, a=a, w=w)
-    else:
-        return gram(k_hilbert2_ab_weighted, X, Y, a=a, b=b, w=w)
-
-
-# def kmat_hilbert2_a_inf_b_fin_weighted(x, y, b, w):
-#    return gram(k_hilbert2_a_inf_b_fin_weighted, x, y, b, w)
-
-# def kmat_hilbert2_a_fin_b_neginf_weighted(x, y, a, w):
-#    return gram(k_hilbert2_a_fin_b_neginf_weighted, x, y, a, w)
-
-# def kmat_hilbert2_ab_weighted(x, y, a, b, w):
-#    return gram(k_hilbert2_ab_weighted, x, y, a, b, w)
-
-
-# ------------------------------------------------------------------------------
-# --------------------------------- Special Cases  -----------------------------
-
-@jit
-def k_chisq_weighted(x, y, w):
-    inv_p = 1.0 / x.shape[0]
-
-    mesh = jnp.stack(jnp.meshgrid(x, y))
-    x = mesh[0].reshape(-1)
-    y = mesh[1].reshape(-1)
-    w = w.reshape(-1)
-
-    # with np.errstate(divide='ignore', invalid='ignore'):
-    t1 = (x - y) ** 2 / (x + y)
-    t2 = (x - inv_p) ** 2 / (x + inv_p)
-    t3 = (y - inv_p) ** 2 / (y + inv_p)
-    return -0.5 * (jnp.nansum(w * (t1 - t2 - t3)))
-
-
-def kmat_chisq_weighted(x, y, w):
-    return gram(k_chisq_weighted, x, y, w=w)
-
-
 @jit
 def k_hellinger_weighted(x, y, w):
     p = x.shape[0]
@@ -376,8 +266,20 @@ def k_hellinger_weighted(x, y, w):
     return 0.5 * jnp.sum(w * (1 / p + t1))
 
 
-def kmat_hellinger_weighted(x, y, w):
-    return gram(k_hellinger_weighted, x, y, w=w)
+@jit
+def k_chisq_weighted(x, y, w):
+    inv_p = 1.0 / x.shape[0]
+
+    mesh = jnp.stack(jnp.meshgrid(x, y))
+    x = mesh[0].reshape(-1)
+    y = mesh[1].reshape(-1)
+    w = w.reshape(-1)
+
+    # with np.errstate(divide='ignore', invalid='ignore'):
+    t1 = (x - y) ** 2 / (x + y)
+    t2 = (x - inv_p) ** 2 / (x + inv_p)
+    t3 = (y - inv_p) ** 2 / (y + inv_p)
+    return -0.5 * (jnp.nansum(w * (t1 - t2 - t3)))
 
 
 @jit
@@ -397,10 +299,6 @@ def k_js_weighted(x, y, w):
     return -0.25 * jnp.nansum(w * (t1 + t2 - t3))
 
 
-def kmat_js_weighted(x, y, w):
-    return gram(k_js_weighted, x, y, w=w)
-
-
 @jit
 def k_tv_weighted(x, y, w):
     p = x.shape[0]
@@ -412,6 +310,76 @@ def k_tv_weighted(x, y, w):
     w = w.reshape(-1)
 
     return -0.25 * jnp.sum(w * (abs(x - y) - abs(x - inv_p) - abs(y - inv_p)))
+
+
+# ---- kernel matrices ----
+
+
+def kmat_linear_weighted(X, Y, w):
+    return gram(k_linear_weighted, X, Y, w=w)
+
+
+def kmat_rbf_weighted(X, Y, g, w):
+    return gram(k_rbf_weighted, X, Y, g=g, w=w)
+
+
+def kmat_hd_weighted(X, Y, t, w):
+    return gram(k_hd_weighted, X, Y, t=t, w=w)
+
+
+def kmat_aitchison_weighted(x, y, c, w):
+    return gram(k_aitchison_weighted, x, y, c=c, w=w)
+
+
+def kmat_aitchison_rbf_weighted(x, y, g, c, w):
+    return gram(k_aitchison_rbf_weighted, x, y, g=g, c=c, w=w)
+
+
+def kmat_hilbert1_weighted(X, Y, a, b, w):
+    # print(f'a = {a}')
+    # print(f'b = {b}')
+    assert(a >= 1)
+    assert(b >= 0.5 and b <= a)
+    if jnp.isinf(a) and a == b:
+        # Note: jnp.inf == jnp.inf is True
+        return gram(k_hilbert1_b_inf_weighted, X, Y, w=w)
+    elif not jnp.isinf(a) and a == b:
+        return gram(k_hilbert1_b_fin_weighted, X, Y, b=a, w=w)
+    # TODO : check the case of a=infty and b=1 is still caught in the clause below
+    # elif jnp.isinf(a) and b == 1:
+    #    return 2*kmat_tv_weighted(X, Y, w=w)
+    elif jnp.isinf(a) and not jnp.isinf(b):
+        # Note: with a = inf and b = 1, should be the same as 2*kmat_tv(X,Y)
+        #  but kmat_tv should be faster
+        return gram(k_hilbert1_a_inf_b_fin_weighted, X, Y, b=b, w=w)
+    else:
+        # print("diff a b case")
+        return gram(k_hilbert1_ab_weighted, X, Y, a=a, b=b, w=w)
+
+
+def kmat_hilbert2_weighted(X, Y, a, b, w):
+    assert(a >= 1)
+    assert(b <= -1)
+    # cannot both be inf (TODO: double check?)
+    assert(not jnp.isinf(a) or not jnp.isinf(b))
+    if jnp.isinf(a) and not jnp.isinf(b):
+        return gram(k_hilbert2_a_inf_b_fin_weighted, X, Y, b=b, w=w)
+    elif not jnp.isinf(a) and jnp.isinf(b):
+        return gram(k_hilbert2_a_fin_b_neginf_weighted, X, Y, a=a, w=w)
+    else:
+        return gram(k_hilbert2_ab_weighted, X, Y, a=a, b=b, w=w)
+
+
+def kmat_chisq_weighted(x, y, w):
+    return gram(k_chisq_weighted, x, y, w=w)
+
+
+def kmat_hellinger_weighted(x, y, w):
+    return gram(k_hellinger_weighted, x, y, w=w)
+
+
+def kmat_js_weighted(x, y, w):
+    return gram(k_js_weighted, x, y, w=w)
 
 
 def kmat_tv_weighted(x, y, w):

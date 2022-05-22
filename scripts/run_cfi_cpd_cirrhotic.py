@@ -2,20 +2,20 @@
 # load libs
 # ^^^^^^
 
-on_computerome = True  # nopep8
-import sys  # nopep8
-if on_computerome:
-    sys.path.insert(0, "./KernelBiome/")
-else:
-    sys.path.insert(0, "../")  # nopep8
+# import sys  # nopep8
+# if on_computerome:
+#     sys.path.insert(0, "./KernelBiome/")
+# else:
+#     sys.path.insert(0, "../")  # nopep8
 
 from os.path import join
 from datetime import date
 import numpy as np
-from src.kernels_jax import *
-from src.weighted_kernels_jax import *
-from src.cfi import *
-from src.utils import *
+from kernelbiome.kernels_jax import *
+from kernelbiome.kernels_weighted_jax import *
+from kernelbiome.cfi_and_cpd import *
+from kernelbiome.utils_cv import *
+from kernelbiome.utils_result import *
 import load_cirrhotic
 import setup_params
 
@@ -25,6 +25,8 @@ today = date.today()
 # %%
 # set up paths
 # ^^^^^^
+
+on_computerome = True  # nopep8
 
 # input and output paths
 if on_computerome:

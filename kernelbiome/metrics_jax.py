@@ -1,8 +1,6 @@
-from functools import partial
-import jax
 import jax.numpy as jnp
 from jax import jit
-from src.helpers_jax import *
+from helpers_jax import *
 
 
 @jit
@@ -187,26 +185,3 @@ def d2_hd(x, y, t):
     t0 = jnp.minimum(t0, 1.0)
     t1 = jnp.exp(-1.0/t * jnp.arccos(t0)**2)
     return fac*(1-t1)
-
-
-# def d_unifrac(x, y, n_total_branch):
-#     """
-#     TODO: check the original paper https://scholar.google.com/scholar?hl=en&as_sdt=0%2C5&q=UniFrac%3A+a+New+Phylogenetic+Method+for+Comparing+Microbial+Communities&btnG=
-#     Here the implementation follows the description on wikipedia.
-#     """
-#     x_split = x.split(';')
-#     y_split = y.split(';')
-#     n_unshared_branch = 0.0
-#     for ii in range(min(len(x_split), len(y_split))):
-#         if x_split[ii] != y_split[ii]:
-#             n_unshared_branch += 1
-#     n_unshared_branch += abs(len(x_split)-len(y_split))
-#     return n_unshared_branch/n_total_branch
-
-
-# def d2_pp(x, y, q, tol=1e-7):
-#     assert(q > 0)
-#     res = sum(x**(2*q)) + sum(y**(2*q)) - 2*(x**q).dot(y**q)
-#     if res < 0 and np.abs(res) < tol:
-#         res = 0.0
-#     return res

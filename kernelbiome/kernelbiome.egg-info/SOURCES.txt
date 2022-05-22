@@ -1,0 +1,9 @@
+LICENSE
+MANIFEST.in
+README.md
+setup.py
+kernelbiome/kernelbiome.egg-info/PKG-INFO
+kernelbiome/kernelbiome.egg-info/SOURCES.txt
+kernelbiome/kernelbiome.egg-info/dependency_links.txt
+kernelbiome/kernelbiome.egg-info/requires.txt
+kernelbiome/kernelbiome.egg-info/top_level.txt

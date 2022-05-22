@@ -1,15 +1,12 @@
-from matplotlib.pyplot import axis
 import unifrac
 import skbio
-
 from newick import loads, write
 import numpy as np
 import jax.numpy as jnp
 import pandas as pd
 from biom.table import Table
 from biom.util import biom_open
-
-from src.tree_utils import df2newick, traverse
+from src.utils_unifrac import df2newick, traverse
 
 
 def normalize(X, axis="all"):

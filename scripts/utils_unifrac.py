@@ -21,12 +21,14 @@ def get_A(
     A_ = np.zeros((n_tips, n_nodes))
 
     for i in np.arange(n_nodes):
-        leaves_i = list(set(tree.get_node_descendant_idxs(i)) & set(np.arange(n_tips)))
+        leaves_i = list(set(tree.get_node_descendant_idxs(i))
+                        & set(np.arange(n_tips)))
         A_[leaves_i, i] = 1
 
     # collapsed trees may have scrambled leaves.
     # Therefore, we permute the rows of A such that they are in the original order. Columns (nodes) stay permuted.
-    scrambled_leaves = list(tree.get_node_values("idx_orig", True, True)[-n_tips:])
+    scrambled_leaves = list(tree.get_node_values(
+        "idx_orig", True, True)[-n_tips:])
     scrambled_leaves.reverse()
     if scrambled_leaves[0] == '':
         scrambled_leaves = list(np.arange(0, n_tips, 1))
@@ -50,7 +52,8 @@ def collapse_singularities(
 
     repeated_idx = []
     for repeated_group in unq[count > 1]:
-        repeated_idx.append(np.argwhere(np.all(A_T == repeated_group, axis=1)).ravel())
+        repeated_idx.append(np.argwhere(
+            np.all(A_T == repeated_group, axis=1)).ravel())
 
     nodes_to_delete = [i for idx in repeated_idx for i in idx[1:]]
 
@@ -75,7 +78,8 @@ def collapse_singularities(
 
 def traverse(df_, a, i, innerl):
     if i+1 < df_.shape[1]:
-        a_inner = pd.unique(df_.loc[np.where(df_.iloc[:, i] == a)].iloc[:, i+1])
+        a_inner = pd.unique(
+            df_.loc[np.where(df_.iloc[:, i] == a)].iloc[:, i+1])
 
         desc = []
         for b in a_inner:

@@ -1,6 +1,5 @@
-import sys  # nopep8
-sys.path.insert(0, "../")  # nopep8
-
+# import sys  # nopep8
+# sys.path.insert(0, "../")  # nopep8
 import numpy as np
 from sklearn.model_selection import GridSearchCV
 from sklearn.linear_model import Lasso
@@ -8,7 +7,8 @@ from sklearn.svm import SVR
 from sklearn.dummy import DummyRegressor
 from sklearn.ensemble import RandomForestRegressor
 from classo import classo_problem
-from src.utils import *
+from kernelbiome.utils_cv import *
+from kernelbiome.utils_result import *
 
 
 def one_fold_part1(X_df, X, y, label, tr, te, param_grid_baseline, param_grid_lasso, param_grid_svr_rbf, param_grid_rf):

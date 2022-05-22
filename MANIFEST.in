@@ -1,0 +1,3 @@
+exclude script
+exclude data
+exclude notebooks

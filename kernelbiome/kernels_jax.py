@@ -1,8 +1,7 @@
-# from typing import Optional, Callable, Dict
 from functools import partial
 import jax.numpy as jnp
 from jax import jit
-from src.helpers_jax import *
+from helpers_jax import *
 
 
 # ---- kernel functions on vectors ----
@@ -153,11 +152,6 @@ def k_hilbert1_b_inf(x, y):
     t1 = jnp.maximum(x, y)*(x != y)
     t2 = jnp.maximum(x, inv_p)*(x != inv_p)
     t3 = jnp.maximum(y, inv_p)*(y != inv_p)
-    # t1 = jnp.maximum(x, y)*(jnp.log(2)*(x > y) + jnp.log(2)*(y > x))
-    # t2 = jnp.maximum(x, inv_p)*(jnp.log(2) *
-    #                             (x > inv_p) + jnp.log(2)*(inv_p > x))
-    # t3 = jnp.maximum(inv_p, y)*(jnp.log(2) *
-    #                             (inv_p > y) + jnp.log(2)*(y > inv_p))
     return 0.5*jnp.log(2)*(-t1+t2+t3).sum()
 
 
