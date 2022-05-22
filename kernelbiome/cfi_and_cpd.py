@@ -74,6 +74,15 @@ def get_cpd(X, supp_grid, pred_fun, comp_idx=None, rescale=True, verbose=False):
 
 # ---- CFI calculation ----
 
+def num_df_mat(fun, h, X):
+    n, p = X.shape
+    res = np.zeros((n, p))
+    for jj in range(p):
+        ej = np.zeros(p)
+        ej[jj] = 1
+        res[:, jj] = (fun(X + h/2*ej) - fun(X - h/2*ej))/h
+    return res
+
 
 def dphi_mat(X, jj):
     """

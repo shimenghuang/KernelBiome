@@ -1,5 +1,6 @@
 import pandas as pd
 from collections import Counter
+from kernels_jax import *
 
 
 # ---- helpers for using the return value of top_models_in_each_group ----
