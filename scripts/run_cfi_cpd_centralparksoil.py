@@ -3,18 +3,25 @@
 # ^^^^^^
 
 on_computerome = True  # nopep8
+# import sys  # nopep8
+# if on_computerome:
+#     sys.path.insert(0, "./KernelBiome/")
+# else:
+#     sys.path.insert(0, "../")  # nopep8
+
+from pathlib import Path  # nopep8
 import sys  # nopep8
-if on_computerome:
-    sys.path.insert(0, "./KernelBiome/")
-else:
-    sys.path.insert(0, "../")  # nopep8
+path_root = Path(__file__).parents[1]  # nopep8
+sys.path.append(str(path_root))  # nopep8
 
 from os.path import join
 from datetime import date
 import numpy as np
-from src.kernels_jax import *
-from src.cfi import *
-from src.utils import *
+from kernelbiome.kernels_jax import *
+from kernelbiome.nested_cv import *
+from kernelbiome.cfi_and_cpd import *
+from kernelbiome.utils_cv import *
+from kernelbiome.utils_result import *
 import load_centralparksoil
 import setup_params
 

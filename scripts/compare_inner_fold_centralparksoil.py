@@ -1,5 +1,8 @@
-# import sys  # nopep8
-# sys.path.insert(0, "../")  # nopep8
+from pathlib import Path  # nopep8
+import sys  # nopep8
+path_root = Path(__file__).parents[1]  # nopep8
+sys.path.append(str(path_root))  # nopep8
+
 import numpy as np
 from sklearn.model_selection import GridSearchCV
 from sklearn.linear_model import Lasso
@@ -7,6 +10,7 @@ from sklearn.svm import SVR
 from sklearn.dummy import DummyRegressor
 from sklearn.ensemble import RandomForestRegressor
 from classo import classo_problem
+from kernelbiome.nested_cv import *
 from kernelbiome.utils_cv import *
 from kernelbiome.utils_result import *
 

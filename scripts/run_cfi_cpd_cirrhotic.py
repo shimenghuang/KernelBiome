@@ -2,17 +2,17 @@
 # load libs
 # ^^^^^^
 
-# import sys  # nopep8
-# if on_computerome:
-#     sys.path.insert(0, "./KernelBiome/")
-# else:
-#     sys.path.insert(0, "../")  # nopep8
+from pathlib import Path  # nopep8
+import sys  # nopep8
+path_root = Path(__file__).parents[1]  # nopep8
+sys.path.append(str(path_root))  # nopep8
 
 from os.path import join
 from datetime import date
 import numpy as np
 from kernelbiome.kernels_jax import *
 from kernelbiome.kernels_weighted_jax import *
+from kernelbiome.nested_cv import *
 from kernelbiome.cfi_and_cpd import *
 from kernelbiome.utils_cv import *
 from kernelbiome.utils_result import *

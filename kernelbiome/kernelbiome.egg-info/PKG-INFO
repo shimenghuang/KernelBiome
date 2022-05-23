@@ -15,9 +15,29 @@ License-File: LICENSE
 
 # KernelBiome
 
-Note: currently this repository contains code that can reproduce outputs in the paper [TODO: add link]. The `KernelBiome` python package will be available within the upcoming two weeks.
+Note: This repository contains code that can reproduce outputs in the paper [Supervised Learning and Model Analysis with Compositional Data (Huang et al., 2022)](https://arxiv.org/abs/2205.07271). The `KernelBiome` python package will be available on PyPI within the upcoming week.
 
-## Current Content
+## The KernelBiome Package
+
+Currently the package can be installed via 
+
+```
+python -m pip install git+https://github.com/shimenghuang/KernelBiome.git
+```
+
+The package contains the following modules:
+
+- `metrics_jax.py`: distance metrics with jax.
+- `kernels_jax.py`: kernel functions with jax.
+- `helpers_jax.py`: helper functions for kernels and metrics with jax.
+- `weighted_kernels_jax.py`: weighted kernel functions with jax.
+- `helpers_weighting.py`: helpers for calculating weight matrices. 
+- `cfi_and_cpd.py`: CFI and CPD calculation.
+- `nested_cv`: functions for nested CV.
+- `utils_cv.py`: utility functions including utilities for nested CV 
+- `utils_result.py`: utility functions for result summary.
+
+## Reproducible Code
 
 ### `data`
 
@@ -26,24 +46,11 @@ This folder should contain two subfolders:
 - `MLRepo` which should contain a subfolder `qin2014` containing data directly taken from [here](https://github.com/knights-lab/MLRepo/tree/master/datasets/qin2014).
 - `CentralParkSoil` should contain data pre-processed by `prep_centralparksoil.R` based on data from [here](https://github.com/jacobbien/trac-reproducible/tree/main/CentralParkSoil/original).
 
-### `src`
-
-This folder contains most functions to be included in the `KernelBiome` package:
-
-- `metrics_jax.py`: distance metrics with jax.
-- `kernels_jax.py`: kernel functions with jax.
-- `helpers_jax.py`: helper functions for kernels and metrics with jax.
-- `weighted_kernels_jax.py`: weighted kernel functions with jax.
-- `helpers_weighting.py`: helpers for calculating weight matrices. 
-- `tree_utils.py`: utility functions regardign the UniFrac distance.
-- `cfi.py`: CFI and CPD calculation.
-- `utils.py`: general utility functions including utilities for nested CV and result summary.
-- `simplex_heatmap.py`: heatmap functons to visualize kernels on 2-simplex.
-
 ### `scripts`
 
 This folder contains scripts that can reproduce resutls in the paper:
 
+- `tree_utils.py`: utility functions regardign the UniFrac distance.
 - `load_<ds>.py`: load the dataset into proper format.
 - `create_unifrac_weights_<ds>.py`: create the UniFrac based weight matrices.
 - `setup_params.py`: set up kernel parameters and hyperparameters.
@@ -60,5 +67,6 @@ where `<ds>` is one of `cirrhotic` or `centralparksoil`.
 
 This folder contains notebooks for demonstration:
 
+- `simplex_heatmap.py`: heatmap functons to visualize kernels on 2-simplex.
 - `workflow_demo.ipynb`: A workflow demonstration using simulated data.
 - `visualization_writeup.ipynb`: Visualization of kernels with heatmap on 2-simplex.

@@ -2,11 +2,8 @@
 # load libs
 # ^^^^^^
 
-import sys  # nopep8
-sys.path.insert(0, "../")  # nopep8 # to load modules in src folder
-
 import matplotlib.pyplot as plt
-from src.helpers_weighting import *
+from helpers_weighting import *
 import load_centralparksoil
 
 # %%

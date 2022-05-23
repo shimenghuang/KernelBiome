@@ -1,5 +1,7 @@
+from pathlib import Path  # nopep8
 import sys  # nopep8
-sys.path.insert(0, "../")  # nopep8
+path_root = Path(__file__).parents[1]  # nopep8
+sys.path.append(str(path_root))  # nopep8
 
 import numpy as np
 from sklearn.model_selection import GridSearchCV
@@ -8,7 +10,8 @@ from sklearn.svm import SVC
 from sklearn.dummy import DummyClassifier
 from sklearn.ensemble import RandomForestClassifier
 from classo import classo_problem
-from src.utils import *
+from kernelbiome.utils_cv import *
+from kernelbiome.utils_result import *
 
 
 def one_fold_part1(X_df, X, y, label, tr, te, param_grid_lr, param_grid_svc_rbf, param_grid_rf):

@@ -2,15 +2,17 @@
 # load libs
 # ^^^^^^
 
+from pathlib import Path  # nopep8
 import sys  # nopep8
-sys.path.insert(0, "../")  # nopep8
+path_root = Path(__file__).parents[1]  # nopep8
+sys.path.append(str(path_root))  # nopep8
 
 from matplotlib import rc
 import matplotlib.pyplot as plt
-from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier
 import numpy as np
 import pandas as pd
-from src.cfi import *
+from kernelbiome.cfi_and_cpd import *
 import load_cirrhotic
 
 seed_num = 2022

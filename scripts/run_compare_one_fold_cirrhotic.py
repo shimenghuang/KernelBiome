@@ -4,16 +4,22 @@
 
 on_computerome = True  # nopep8
 
+# import sys  # nopep8
+# if on_computerome:  # nopep8
+#     sys.path.insert(0, "./KernelBiome/")  # nopep8
+# else:  # nopep8
+#     sys.path.insert(0, "../")  # nopep8
+from pathlib import Path  # nopep8
 import sys  # nopep8
-if on_computerome:  # nopep8
-    sys.path.insert(0, "./KernelBiome/")  # nopep8
-else:  # nopep8
-    sys.path.insert(0, "../")  # nopep8
+path_root = Path(__file__).parents[1]  # nopep8
+sys.path.append(str(path_root))  # nopep8
 
 from os.path import join
 import numpy as np
-from src.helpers_jax import *
-from src.utils import *
+from kernelbiome.helpers_jax import *
+from kernelbiome.nested_cv import *
+from kernelbiome.utils_cv import *
+from kernelbiome.utils_result import *
 import load_cirrhotic
 import compare_inner_fold_cirrhotic
 

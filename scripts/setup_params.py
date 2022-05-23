@@ -2,12 +2,14 @@
 # load libs
 # ^^^^^^
 
+from pathlib import Path  # nopep8
 import sys  # nopep8
-sys.path.insert(0, "../")  # nopep8
+path_root = Path(__file__).parents[1]  # nopep8
+sys.path.append(str(path_root))  # nopep8
 
-from os.path import join
-from src.kernels_jax import *
-from src.utils import *
+from kernelbiome.kernels_jax import *
+from kernelbiome.utils_cv import *
+from kernelbiome.utils_result import *
 
 # %%
 # median heruisic for RBF and Aitchison-RBF
