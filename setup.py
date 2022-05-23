@@ -17,8 +17,9 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    package_dir={"kernelbiome": "."},
-    packages=setuptools.find_packages(where="kernelbiome"),
+    # package_dir={"kernelbiome": "."},
+    # packages=setuptools.find_packages(where="kernelbiome"),
+    packages=setuptools.find_packages(include="kernelbiome*"),
     python_requires=">=3.9",
     install_requires=[
         'numpy',
