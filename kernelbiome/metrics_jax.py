@@ -1,6 +1,6 @@
 import jax.numpy as jnp
 from jax import jit
-from helpers_jax import *
+from .helpers_jax import *
 
 
 @jit

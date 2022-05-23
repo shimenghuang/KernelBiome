@@ -1,8 +1,8 @@
 from itertools import product
 import numpy as np
-from helpers_jax import wrap
-from kernels_jax import *
-from kernels_weighted_jax import *
+from .helpers_jax import wrap
+from .kernels_jax import *
+from .kernels_weighted_jax import *
 
 
 def get_rbf_bandwidth(m):

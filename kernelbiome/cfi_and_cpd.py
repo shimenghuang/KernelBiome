@@ -2,7 +2,7 @@ import numpy as np
 from jax import grad
 from sklearn.metrics import mean_squared_error
 import matplotlib.pyplot as plt
-from utils_compositional import C_partial
+from .utils_compositional import C_partial
 
 # ---- CPD calculation ----
 

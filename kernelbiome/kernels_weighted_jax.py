@@ -1,7 +1,7 @@
 from functools import partial
 import jax.numpy as jnp
 from jax import jit
-from helpers_jax import gmean, gram
+from .helpers_jax import gmean, gram
 
 # ---- kernel functions on vectors ----
 
