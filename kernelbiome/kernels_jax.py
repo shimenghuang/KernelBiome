@@ -1,7 +1,7 @@
 from functools import partial
 import jax.numpy as jnp
 from jax import jit
-from helpers_jax import *
+from .helpers_jax import *
 
 
 # ---- kernel functions on vectors ----
