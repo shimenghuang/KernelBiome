@@ -10,3 +10,4 @@ notebooks/output/*
 notebooks/__pycache__
 data/*
 !data/.gitkeep
+dist/*

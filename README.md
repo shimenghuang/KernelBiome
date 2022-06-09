@@ -1,14 +1,14 @@
 # KernelBiome
 
-Note: This repository contains code that can reproduce outputs in the paper [Supervised Learning and Model Analysis with Compositional Data (Huang et al., 2022)](https://arxiv.org/abs/2205.07271). The `KernelBiome` python package will be available on PyPI within the upcoming week.
-
-## The KernelBiome Package
-
-Currently the package can be installed via 
+Note: This repository contains code that can reproduce outputs in the paper [Supervised Learning and Model Analysis with Compositional Data (Huang et al., 2022)](https://arxiv.org/abs/2205.07271). The `KernelBiome` python package currently can be installed via 
 
 ```
 python -m pip install git+https://github.com/shimenghuang/KernelBiome.git
 ```
+
+and will be available on PyPI within the upcoming week.
+
+## The KernelBiome Package
 
 The package contains the following modules:
 

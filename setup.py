@@ -20,10 +20,10 @@ setuptools.setup(
     packages=setuptools.find_packages(include="kernelbiome*"),
     python_requires=">=3.9",
     install_requires=[
-        'numpy',
-        'pandas',
-        'scikit-learn',
-        'jaxlib',
-        'jax'
+        'numpy>=1.22.3',
+        'pandas>=1.3.5',
+        'scikit-learn>=1.0.1',
+        'jaxlib>=0.1.75',
+        'jax>=0.2.26'
     ]
 )

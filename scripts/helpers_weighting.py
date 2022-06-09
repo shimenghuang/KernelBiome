@@ -6,7 +6,7 @@ import jax.numpy as jnp
 import pandas as pd
 from biom.table import Table
 from biom.util import biom_open
-from utils_unifrac import df2newick, traverse
+from utils_tree import df2newick, traverse
 
 
 def normalize(X, axis="all"):

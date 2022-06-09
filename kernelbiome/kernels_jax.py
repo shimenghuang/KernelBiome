@@ -10,7 +10,7 @@ from .helpers_jax import *
 def k_linear(x, y):
     """Linear kernel
 
-    .. math:: k_i = \sum_i^N x_i-y_i
+    .. math:: k_i = \sum_i^N x_i*y_i
 
     Parameters
     ----------
