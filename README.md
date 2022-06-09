@@ -1,12 +1,28 @@
 # KernelBiome
 
-Note: This repository contains code that can reproduce outputs in the paper [Supervised Learning and Model Analysis with Compositional Data (Huang et al., 2022)](https://arxiv.org/abs/2205.07271). The `KernelBiome` python package currently can be installed via 
+Note: This repository contains code that can reproduce outputs in the paper [Supervised Learning and Model Analysis with Compositional Data (Huang et al., 2022)](https://arxiv.org/abs/2205.07271). The `KernelBiome` python package can be installed via 
 
+```
+pip install kernelbiome
+```
+or
 ```
 python -m pip install git+https://github.com/shimenghuang/KernelBiome.git
 ```
 
-and will be available on PyPI within the upcoming week.
+Minimum usage example for testing out installation:
+
+```
+import numpy as np
+from kernelbiome.kernels_jax import *
+
+x = np.random.uniform(0, 1, 5)
+x /= x.sum()
+y = np.random.uniform(0, 1, 5)
+y /= y.sum()
+
+k_linear(x,y)
+```
 
 ## The KernelBiome Package
 

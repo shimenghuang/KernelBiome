@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="kernelbiome",
-    version="0.1.0",
+    version="0.1.1",
     author="Shimeng Huang, Elisabeth Ailer",
     author_email="shimeng@math.ku.dk, elisabeth.ailer@helmholtz-muenchen.de",
     description="A kernel-based nonparametric regression and classication framework for compositional data.",
