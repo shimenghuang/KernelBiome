@@ -116,7 +116,7 @@ def run_nested_cv(X_given, y, estimator, estimator_param_grid, scoring, kmat_fun
     return train_scores, test_scores, selected_params
 
 
-def run_experiments(X, y, mod_with_params, param_grid_ke, param_grid_rf=None, param_grid_bl=None, center_kmat=False, fac_grid=None,
+def run_experiments(X, y, mod_with_params, param_grid_ke, param_grid_rf=None, param_grid_bl=None, center_kmat=False,
                     n_fold_outer=10, n_fold_inner=5, type='regression', scoring='neg_mean_squared_error', kernel_estimator='kr',
                     n_jobs=6, random_state=None, verbose=0, do_save=False, do_save_filename="res.pickle", print_each=True):
     """
@@ -229,7 +229,7 @@ def run_experiments(X, y, mod_with_params, param_grid_ke, param_grid_rf=None, pa
     return train_scores_all, test_scores_all, selected_params_all
 
 
-def fit_model(X, y, estimator_name, estimator_param_grid, kmat_fun, scoring, center_kmat=True, fac_grid=None, n_fold=5, n_jobs=6, verbose=0):
+def fit_model(X, y, estimator_name, estimator_param_grid, kmat_fun, scoring, center_kmat=True, n_fold=5, n_jobs=6, verbose=0):
     """
     estimator_name: str
         one of 'KernelRidge', 'SVR', or 'SVC'.

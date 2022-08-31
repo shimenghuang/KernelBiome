@@ -1,6 +1,7 @@
 import pandas as pd
 from collections import Counter
-from .kernels_jax import *
+from kernelbiome.kernels_jax import *
+from kernelbiome.kernels_weighted_jax import *
 
 
 # ---- helpers for using the return value of top_models_in_each_group ----

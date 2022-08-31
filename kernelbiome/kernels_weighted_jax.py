@@ -1,7 +1,7 @@
 from functools import partial
 import jax.numpy as jnp
 from jax import jit
-from .helpers_jax import gmean, gram
+import kernelbiome.helpers_jax as hj
 
 # ---- kernel functions on vectors ----
 
@@ -41,8 +41,8 @@ def k_aitchison_weighted(x, y, c, w):
     x = x / x.sum()
     y = y + c
     y = y / y.sum()
-    gm_x = gmean(x)
-    gm_y = gmean(y)
+    gm_x = hj.gmean(x)
+    gm_y = hj.gmean(y)
 
     mesh = jnp.stack(jnp.meshgrid(x, y))
     x = mesh[0].reshape(-1)
@@ -61,8 +61,8 @@ def k_aitchison_rbf_weighted(x, y, g, c, w):
     x = x / x.sum()
     y = y + c
     y = y / y.sum()
-    gm_x = gmean(x)
-    gm_y = gmean(y)
+    gm_x = hj.gmean(x)
+    gm_y = hj.gmean(y)
 
     mesh = jnp.stack(jnp.meshgrid(x, y))
     x = mesh[0].reshape(-1)
@@ -316,23 +316,23 @@ def k_tv_weighted(x, y, w):
 
 
 def kmat_linear_weighted(X, Y, w):
-    return gram(k_linear_weighted, X, Y, w=w)
+    return hj.gram(k_linear_weighted, X, Y, w=w)
 
 
 def kmat_rbf_weighted(X, Y, g, w):
-    return gram(k_rbf_weighted, X, Y, g=g, w=w)
+    return hj.gram(k_rbf_weighted, X, Y, g=g, w=w)
 
 
 def kmat_hd_weighted(X, Y, t, w):
-    return gram(k_hd_weighted, X, Y, t=t, w=w)
+    return hj.gram(k_hd_weighted, X, Y, t=t, w=w)
 
 
 def kmat_aitchison_weighted(x, y, c, w):
-    return gram(k_aitchison_weighted, x, y, c=c, w=w)
+    return hj.gram(k_aitchison_weighted, x, y, c=c, w=w)
 
 
 def kmat_aitchison_rbf_weighted(x, y, g, c, w):
-    return gram(k_aitchison_rbf_weighted, x, y, g=g, c=c, w=w)
+    return hj.gram(k_aitchison_rbf_weighted, x, y, g=g, c=c, w=w)
 
 
 def kmat_hilbert1_weighted(X, Y, a, b, w):
@@ -342,19 +342,19 @@ def kmat_hilbert1_weighted(X, Y, a, b, w):
     assert(b >= 0.5 and b <= a)
     if jnp.isinf(a) and a == b:
         # Note: jnp.inf == jnp.inf is True
-        return gram(k_hilbert1_b_inf_weighted, X, Y, w=w)
+        return hj.gram(k_hilbert1_b_inf_weighted, X, Y, w=w)
     elif not jnp.isinf(a) and a == b:
-        return gram(k_hilbert1_b_fin_weighted, X, Y, b=a, w=w)
+        return hj.gram(k_hilbert1_b_fin_weighted, X, Y, b=a, w=w)
     # TODO : check the case of a=infty and b=1 is still caught in the clause below
     # elif jnp.isinf(a) and b == 1:
     #    return 2*kmat_tv_weighted(X, Y, w=w)
     elif jnp.isinf(a) and not jnp.isinf(b):
         # Note: with a = inf and b = 1, should be the same as 2*kmat_tv(X,Y)
         #  but kmat_tv should be faster
-        return gram(k_hilbert1_a_inf_b_fin_weighted, X, Y, b=b, w=w)
+        return hj.gram(k_hilbert1_a_inf_b_fin_weighted, X, Y, b=b, w=w)
     else:
         # print("diff a b case")
-        return gram(k_hilbert1_ab_weighted, X, Y, a=a, b=b, w=w)
+        return hj.gram(k_hilbert1_ab_weighted, X, Y, a=a, b=b, w=w)
 
 
 def kmat_hilbert2_weighted(X, Y, a, b, w):
@@ -363,24 +363,24 @@ def kmat_hilbert2_weighted(X, Y, a, b, w):
     # cannot both be inf (TODO: double check?)
     assert(not jnp.isinf(a) or not jnp.isinf(b))
     if jnp.isinf(a) and not jnp.isinf(b):
-        return gram(k_hilbert2_a_inf_b_fin_weighted, X, Y, b=b, w=w)
+        return hj.gram(k_hilbert2_a_inf_b_fin_weighted, X, Y, b=b, w=w)
     elif not jnp.isinf(a) and jnp.isinf(b):
-        return gram(k_hilbert2_a_fin_b_neginf_weighted, X, Y, a=a, w=w)
+        return hj.gram(k_hilbert2_a_fin_b_neginf_weighted, X, Y, a=a, w=w)
     else:
-        return gram(k_hilbert2_ab_weighted, X, Y, a=a, b=b, w=w)
+        return hj.gram(k_hilbert2_ab_weighted, X, Y, a=a, b=b, w=w)
 
 
 def kmat_chisq_weighted(x, y, w):
-    return gram(k_chisq_weighted, x, y, w=w)
+    return hj.gram(k_chisq_weighted, x, y, w=w)
 
 
 def kmat_hellinger_weighted(x, y, w):
-    return gram(k_hellinger_weighted, x, y, w=w)
+    return hj.gram(k_hellinger_weighted, x, y, w=w)
 
 
 def kmat_js_weighted(x, y, w):
-    return gram(k_js_weighted, x, y, w=w)
+    return hj.gram(k_js_weighted, x, y, w=w)
 
 
 def kmat_tv_weighted(x, y, w):
-    return gram(k_tv_weighted, x, y, w=w)
+    return hj.gram(k_tv_weighted, x, y, w=w)

@@ -1,6 +1,6 @@
 import jax.numpy as jnp
 from jax import jit
-from .helpers_jax import *
+import kernelbiome.helpers_jax as hj
 
 
 @jit
@@ -43,8 +43,8 @@ def d2_aitchison_rbf(x, y, g, c=0):
     x = x / x.sum()
     y = y + c
     y = y / y.sum()
-    gm_x = gmean(x)
-    gm_y = gmean(y)
+    gm_x = hj.gmean(x)
+    gm_y = hj.gmean(y)
     clr_x = jnp.log(x/gm_x)
     clr_y = jnp.log(y/gm_y)
     return 2-2*jnp.exp(-g*jnp.sum(((clr_x-clr_y)**2)))

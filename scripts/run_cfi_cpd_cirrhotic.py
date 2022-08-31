@@ -33,8 +33,8 @@ if on_computerome:
     data_path = "KernelBiome/data/MLRepo/qin2014"
     output_path = "KernelBiome/scripts/output"
 else:
-    data_path = "/Users/hrt620/Documents/projects/kernelbiome_proj/kernelbiome_clean/data/MLRepo/qin2014"
-    output_path = "/Users/hrt620/Documents/projects/kernelbiome_proj/kernelbiome_clean/scripts/output"
+    data_path = "/Users/hrt620/Documents/ku_projects/kernelbiome_proj/kernelbiome_clean/data/MLRepo/qin2014"
+    output_path = "/Users/hrt620/Documents/ku_projects/kernelbiome_proj/kernelbiome_clean/scripts/output"
 
 # %%
 # load data

@@ -10,15 +10,12 @@ For taxa data (usage example see load_data.ipynb):
 
 """
 
-from audioop import avg
-import pandas as pd
 import os
 import numpy as np
-from scipy import rand
+import pandas as pd
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 import matplotlib.pyplot as plt
 import rdata
-import matplotlib.pyplot as plt
 
 
 def load_data(ds_name, data_path=None):

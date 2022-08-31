@@ -10,7 +10,7 @@ import load_cirrhotic
 # load data
 # ^^^^^^
 
-data_path = "/Users/hrt620/Documents/projects/kernelbiome_proj/kernelbiome_clean/data/MLRepo/qin2014"
+data_path = "/Users/hrt620/Documents/ku_projects/kernelbiome_proj/kernelbiome_clean/data/MLRepo/qin2014"
 X_df, y, label = load_cirrhotic.main(data_path=data_path, seed_num=2022)
 
 # %%

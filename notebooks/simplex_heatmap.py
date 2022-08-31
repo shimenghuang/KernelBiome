@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import matplotlib.tri as tri
-from matplotlib import ticker, cm
+# from matplotlib import ticker, cm
 import numpy as np
 
 # adapted from http://blog.bogatron.net/blog/2014/02/02/visualizing-dirichlet-distributions/

@@ -1,7 +1,7 @@
 from functools import partial
 import jax.numpy as jnp
 from jax import jit
-from .helpers_jax import *
+import kernelbiome.helpers_jax as hj
 
 
 # ---- kernel functions on vectors ----
@@ -10,14 +10,14 @@ from .helpers_jax import *
 def k_linear(x, y):
     """Linear kernel
 
-    .. math:: k_i = \sum_i^N x_i*y_i
+    .. math:: k_i = \\sum_i^N x_i*y_i
 
     Parameters
     ----------
-    x : jax.numpy.ndarry
-        input arry of shape (n_features,)
-    y : jax.numpy.ndarry
-        input arry of shape (n_features,)
+    x : jax.numpy.ndarray
+        input array of shape (n_features,)
+    y : jax.numpy.ndarray
+        input array of shape (n_features,)
 
     Returns
     -------
@@ -33,18 +33,18 @@ def k_rbf(x, y, g):
 
     .. math::
 
-        k(\mathbf{x,y}) = \\
-           \\exp \left( - \\gamma\\
+        k(\\mathbf{x,y}) = \\
+           \\exp \\left( - \\gamma\\
            ||\\mathbf{x} - \\mathbf{y}||^2_2\\
             \\right)
 
 
     Parameters
     ----------
-    x : jax.numpy.ndarry
-        input arry of shape (n_features,)
-    y : jax.numpy.ndarry
-        input arry of shape (n_features,)
+    x : jax.numpy.ndarray
+        input array of shape (n_features,)
+    y : jax.numpy.ndarray
+        input array of shape (n_features,)
     g : float
         bandwidth parameter
 
@@ -66,10 +66,10 @@ def k_aitchison(x, y, c=0):
 
     Parameters
     ----------
-    x : jax.numpy.ndarry
-        input arry of shape (n_features,)
-    y : jax.numpy.ndarry
-        input arry of shape (n_features,)
+    x : jax.numpy.ndarray
+        input array of shape (n_features,)
+    y : jax.numpy.ndarray
+        input array of shape (n_features,)
     c : float
         pseudo-count parameter
 
@@ -81,8 +81,8 @@ def k_aitchison(x, y, c=0):
     x = x / x.sum()
     y = y + c
     y = y / y.sum()
-    gm_x = gmean(x)
-    gm_y = gmean(y)
+    gm_x = hj.gmean(x)
+    gm_y = hj.gmean(y)
     clr_x = jnp.log(x/gm_x)
     clr_y = jnp.log(y/gm_y)
     return (clr_x*clr_y).sum()
@@ -94,8 +94,8 @@ def k_aitchison_rbf(x, y, g, c=0):
     x = x / x.sum()
     y = y + c
     y = y / y.sum()
-    gm_x = gmean(x)
-    gm_y = gmean(y)
+    gm_x = hj.gmean(x)
+    gm_y = hj.gmean(y)
     clr_x = jnp.log(x/gm_x)
     clr_y = jnp.log(y/gm_y)
     k = ((clr_x - clr_y)**2).sum()
@@ -287,19 +287,19 @@ def k_hilbert2(x, y, a, b):
 
 
 def kmat_linear(X, Y):
-    return gram(k_linear, X, Y)
+    return hj.gram(k_linear, X, Y)
 
 
 def kmat_js(X, Y):
-    return gram(k_js, X, Y)
+    return hj.gram(k_js, X, Y)
 
 
 def kmat_chisq(X, Y):
-    return gram(k_chisq, X, Y)
+    return hj.gram(k_chisq, X, Y)
 
 
 def kmat_tv(X, Y):
-    return gram(k_tv, X, Y)
+    return hj.gram(k_tv, X, Y)
 
 
 def kmat_hilbert1(X, Y, a, b):
@@ -309,17 +309,17 @@ def kmat_hilbert1(X, Y, a, b):
     assert(b >= 0.5 and b <= a)
     if jnp.isinf(a) and a == b:
         # Note: jnp.inf == jnp.inf is True
-        return gram(k_hilbert1_b_inf, X, Y)
+        return hj.gram(k_hilbert1_b_inf, X, Y)
     elif not jnp.isinf(a) and a == b:
-        return gram(k_hilbert1_b_fin, X, Y, b=a)
+        return hj.gram(k_hilbert1_b_fin, X, Y, b=a)
     elif jnp.isinf(a) and b == 1:
         # Note: with a = inf and b = 1, should be the same as 2*kmat_tv(X,Y)
         #  but kmat_tv should be faster
         return 2*kmat_tv(X, Y)
     elif jnp.isinf(a) and not jnp.isinf(b):
-        return gram(k_hilbert1_a_inf_b_fin, X, Y, b=b)
+        return hj.gram(k_hilbert1_a_inf_b_fin, X, Y, b=b)
     else:
-        return gram(k_hilbert1_ab, X, Y, a=a, b=b)
+        return hj.gram(k_hilbert1_ab, X, Y, a=a, b=b)
 
 
 def kmat_hilbert2(X, Y, a, b):
@@ -328,15 +328,15 @@ def kmat_hilbert2(X, Y, a, b):
     # cannot both be inf (TODO: double check?)
     assert(not jnp.isinf(a) or not jnp.isinf(b))
     if jnp.isinf(a) and not jnp.isinf(b):
-        return gram(k_hilbert2_a_inf_b_fin, X, Y, b=b)
+        return hj.gram(k_hilbert2_a_inf_b_fin, X, Y, b=b)
     elif not jnp.isinf(a) and jnp.isinf(b):
-        return gram(k_hilbert2_a_fin_b_neginf, X, Y, a=a)
+        return hj.gram(k_hilbert2_a_fin_b_neginf, X, Y, a=a)
     else:
-        return gram(k_hilbert2_ab, X, Y, a=a, b=b)
+        return hj.gram(k_hilbert2_ab, X, Y, a=a, b=b)
 
 
 def kmat_hd(X, Y, t):
-    return gram(k_hd, X, Y, t=t)
+    return hj.gram(k_hd, X, Y, t=t)
 
 
 @partial(jit, static_argnames=('g'), inline=True)
@@ -347,7 +347,7 @@ def kmat_rbf(X, Y, g):
     Y: jnp.array of shape (n,p)
     g: if None, use the median heuristic, i.e., g = 1/2*median{||x_i-x^_j||^2: i < j}
     """
-    K = squared_euclidean_distances(X, Y)
+    K = hj.squared_euclidean_distances(X, Y)
     # k_triu = K[jnp.triu_indices(n=K.shape[0], k=1, m=K.shape[1])]
     # g = 1.0/jnp.median(k_triu)
     K *= -g
@@ -357,15 +357,15 @@ def kmat_rbf(X, Y, g):
 @partial(jit, static_argnames=('c_X', 'c_Y'), inline=True)
 def kmat_aitchison(X, Y, c_X=0, c_Y=0):
     """
-    X: jnp.ndarry of shape (n_sample_X, p)
-    Y: jnp.ndarry of shape (n_sample_Y, p)
+    X: jnp.ndarray of shape (n_sample_X, p)
+    Y: jnp.ndarray of shape (n_sample_Y, p)
     c_X: a scalar or jnp.ndarray of shape (n_sample_X,)
     c_Y: a scalar or jnp.ndarray of shape (n_sample_Y,)
     """
     X = X + c_X
     Y = Y + c_Y
-    gm_X = gmean(X, axis=1)
-    gm_Y = gmean(Y, axis=1)
+    gm_X = hj.gmean(X, axis=1)
+    gm_Y = hj.gmean(Y, axis=1)
     clr_X = jnp.log(X/gm_X[:, None])
     clr_Y = jnp.log(Y/gm_Y[:, None])
     return clr_X.dot(clr_Y.T)
@@ -375,11 +375,11 @@ def kmat_aitchison(X, Y, c_X=0, c_Y=0):
 def kmat_aitchison_rbf(X, Y, g, c_X=0, c_Y=0):
     X = X + c_X
     Y = Y + c_Y
-    gm_X = gmean(X, axis=1)
-    gm_Y = gmean(Y, axis=1)
+    gm_X = hj.gmean(X, axis=1)
+    gm_Y = hj.gmean(Y, axis=1)
     clr_X = jnp.log(X/gm_X[:, None])
     clr_Y = jnp.log(Y/gm_Y[:, None])
-    K = squared_euclidean_distances(clr_X, clr_Y)
+    K = hj.squared_euclidean_distances(clr_X, clr_Y)
     # k_triu = K[jnp.triu_indices(n=K.shape[0], k=1, m=K.shape[1])]
     # g = 1.0/jnp.median(k_triu)
     K *= -g
@@ -391,9 +391,9 @@ def kmat_hellinger(X, Y):
     p = X.shape[1]
     X_sqrt = jnp.sqrt(X)
     Y_sqrt = jnp.sqrt(Y)
-    t1 = 0.5*squared_euclidean_distances(X_sqrt, Y_sqrt)
+    t1 = 0.5*hj.squared_euclidean_distances(X_sqrt, Y_sqrt)
     t2 = 0.5 * \
-        squared_euclidean_distances(X_sqrt, jnp.ones_like(Y)/jnp.sqrt(p))
+        hj.squared_euclidean_distances(X_sqrt, jnp.ones_like(Y)/jnp.sqrt(p))
     t3 = 0.5 * \
-        squared_euclidean_distances(jnp.ones_like(X)/jnp.sqrt(p), Y_sqrt)
+        hj.squared_euclidean_distances(jnp.ones_like(X)/jnp.sqrt(p), Y_sqrt)
     return -0.5*t1+0.5*t2+0.5*t3

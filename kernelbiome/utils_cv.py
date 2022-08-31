@@ -1,12 +1,15 @@
+from kernelbiome.helpers_jax import wrap
+import kernelbiome.kernels_jax as kj
+import kernelbiome.kernels_weighted_jax as wkj
 from itertools import product
+import jax.numpy as jnp
 import numpy as np
-from .helpers_jax import wrap
-from .kernels_jax import *
-from .kernels_weighted_jax import *
 
 
 def get_rbf_bandwidth(m):
     """
+    Create a default grid point for bandwidth of rbf kernel.
+
     m: value of median of squared euc. dist.
     """
     return [np.sqrt(m), 0.5*m, m, m**1.5, m**2, m**2.5, 10*m, 100*m]
@@ -62,34 +65,34 @@ def get_kmat_with_params(kernel_params_dict):
     kmat_with_params = {}
     for kname, params in kernel_params_dict.items():
         if kname == 'linear':
-            kmat_with_params[kname] = kmat_linear
+            kmat_with_params[kname] = kj.kmat_linear
         if kname == 'rbf':
             for g in params['g']:
-                kmat_with_params[f'{kname}_g_{g}'] = wrap(kmat_rbf, g=g)
+                kmat_with_params[f'{kname}_g_{g}'] = wrap(kj.kmat_rbf, g=g)
         if kname == 'generalized-js':
             params_ab = list(product(params['a'], params['b']))
             for ab in params_ab:
                 if ab[0] >= 1 and ab[1] >= 0.5 and ab[1] <= ab[0]:
                     kmat_with_params[f'{kname}_a_{ab[0]}_b_{ab[1]}'] = wrap(
-                        kmat_hilbert1, a=ab[0], b=ab[1])
+                        kj.kmat_hilbert1, a=ab[0], b=ab[1])
         if kname == 'hilbertian':
             params_ab = list(product(params['a'], params['b']))
             for ab in params_ab:
                 if ab[0] >= 1 and ab[1] <= -1 and (not jnp.isinf(ab[0]) or not jnp.isinf(ab[1])):
                     kmat_with_params[f'{kname}_a_{ab[0]}_b_{ab[1]}'] = wrap(
-                        kmat_hilbert2, a=ab[0], b=ab[1])
+                        kj.kmat_hilbert2, a=ab[0], b=ab[1])
         if kname == 'aitchison':
             for c in params['c']:
                 kmat_with_params[f'{kname}_c_{c}'] = wrap(
-                    kmat_aitchison, c_X=c, c_Y=c)
+                    kj.kmat_aitchison, c_X=c, c_Y=c)
         if kname == 'aitchison-rbf':
             params_cg = list(product(params['c'], params['g']))
             for cg in params_cg:
                 kmat_with_params[f'{kname}_c_{cg[0]}_g_{cg[1]}'] = wrap(
-                    kmat_aitchison_rbf, c_X=cg[0], c_Y=cg[0], g=cg[1])
+                    kj.kmat_aitchison_rbf, c_X=cg[0], c_Y=cg[0], g=cg[1])
         if kname == 'heat-diffusion':
             for t in params['t']:
-                kmat_with_params[f'{kname}_t_{t}'] = wrap(kmat_hd, t=t)
+                kmat_with_params[f'{kname}_t_{t}'] = wrap(kj.kmat_hd, t=t)
     return kmat_with_params
 
 
@@ -98,35 +101,34 @@ def get_weighted_kmat_with_params(kernel_params_dict, w_unifrac=None):
     for kname, params in kernel_params_dict.items():
         if kname == 'linear_weighted':
             kmat_with_params[f'{kname}'] = wrap(
-                kmat_linear_weighted, w=w_unifrac)
+                wkj.kmat_linear_weighted, w=w_unifrac)
         if kname == 'rbf_weighted':
             for g in params['g']:
                 kmat_with_params[f'{kname}_g_{g}'] = wrap(
-                    kmat_rbf_weighted, g=g, w=w_unifrac)
+                    wkj.kmat_rbf_weighted, g=g, w=w_unifrac)
         if kname == 'generalized-js_weighted':
             params_ab = list(product(params['a'], params['b']))
             for ab in params_ab:
                 if ab[0] >= 1 and ab[1] >= 0.5 and ab[1] <= ab[0]:
-                    kmat_with_params[f'{kname}_a_{ab[0]}_b_{ab[1]}'] = wrap(kmat_hilbert1_weighted, a=ab[0], b=ab[1],
+                    kmat_with_params[f'{kname}_a_{ab[0]}_b_{ab[1]}'] = wrap(wkj.kmat_hilbert1_weighted, a=ab[0], b=ab[1],
                                                                             w=w_unifrac)
         if kname == 'hilbertian_weighted':
             params_ab = list(product(params['a'], params['b']))
             for ab in params_ab:
                 if ab[0] >= 1 and ab[1] <= -1 and (not jnp.isinf(ab[0]) or not jnp.isinf(ab[1])):
-                    kmat_with_params[f'{kname}_a_{ab[0]}_b_{ab[1]}'] = wrap(kmat_hilbert2_weighted, a=ab[0], b=ab[1],
+                    kmat_with_params[f'{kname}_a_{ab[0]}_b_{ab[1]}'] = wrap(wkj.kmat_hilbert2_weighted, a=ab[0], b=ab[1],
                                                                             w=w_unifrac)
         if kname == 'aitchison_weighted':
             for c in params['c']:
                 kmat_with_params[f'{kname}_c_{c}'] = wrap(
-                    kmat_aitchison_weighted, c=c, w=w_unifrac)
+                    wkj.kmat_aitchison_weighted, c=c, w=w_unifrac)
         if kname == 'aitchison-rbf_weighted':
             params_cg = list(product(params['c'], params['g']))
             for cg in params_cg:
                 kmat_with_params[f'{kname}_c_{cg[0]}_g_{cg[1]}'] = wrap(
-                    kmat_aitchison_rbf_weighted, g=cg[1], c=cg[0], w=w_unifrac)
+                    wkj.kmat_aitchison_rbf_weighted, g=cg[1], c=cg[0], w=w_unifrac)
         if kname == 'heat-diffusion_weighted':
             for t in params['t']:
                 kmat_with_params[f'{kname}_t_{t}'] = wrap(
-                    kmat_hd_weighted, t=t, w=w_unifrac)
-
+                    wkj.kmat_hd_weighted, t=t, w=w_unifrac)
     return kmat_with_params

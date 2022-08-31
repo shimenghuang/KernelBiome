@@ -5,7 +5,7 @@ from pathlib import Path  # nopep8
 import sys  # nopep8
 path_root = Path(__file__).parents[1]  # nopep8
 sys.path.append(str(path_root))  # nopep8
-print(sys.path)  # nopep8
+# print(sys.path)  # nopep8
 
 from os.path import join
 from kernelbiome.cfi_and_cpd import *

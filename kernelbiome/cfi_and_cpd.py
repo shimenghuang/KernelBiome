@@ -2,7 +2,7 @@ import numpy as np
 from jax import grad
 from sklearn.metrics import mean_squared_error
 import matplotlib.pyplot as plt
-from .utils_compositional import C_partial
+from kernelbiome.utils_compositional import C_partial
 
 # ---- CPD calculation ----
 
@@ -88,7 +88,7 @@ def dphi_mat(X, jj):
     """
     Calculate the derivative of the pertubation function 
 
-    .. math:: \phi^j(x,c) = C(x^1,\cdots,cx^j,\cdots,x^p)
+    .. math:: \\phi^j(x,c) = C(x^1,\\cdots,cx^j,\\cdots,x^p)
 
     w.r.t. c at c=1.
     """
@@ -104,7 +104,7 @@ def dphi_no_proj_mat(X, jj):
     """
     Calculate the derivative of the pertubation function without rescaling
 
-    .. math:: \phi_{\text{no proj}}^j(x,c) = (x^1,\cdots,cx^j,\cdots,x^p)
+    .. math:: \\phi_{\text{no proj}}^j(x,c) = (x^1,\\cdots,cx^j,\\cdots,x^p)
 
     w.r.t. c at c=1.
     """
