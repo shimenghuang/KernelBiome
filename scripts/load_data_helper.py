@@ -1,5 +1,5 @@
 """
-Simple Collection of load functions for the various datasets
+Collection of load functions for the various datasets
 
 For taxa data (usage example see load_data.ipynb):
    load all data (`load_data`)
@@ -84,10 +84,12 @@ def load_data(ds_name, data_path=None):
 
 def parse_taxa_spec(X_taxa):
     """
+    Create an intermediate dataframe when aggregating levels.
+
     There are 8 levels in total: kingdom; phylum; class; order; family; genus; species; strain
 
     X_taxa: pd.DataFrame
-        columns are subject labels and index contains taxa names in the format of e.g. "k__Archaea;p__Crenarchaeota;c__Thaumarchaeota;o__Cenarchaeales;f__SAGMA-X;g__2517"
+        columns are subject labels and (row) index contains taxa names in the format of e.g. "k__Archaea;p__Crenarchaeota;c__Thaumarchaeota;o__Cenarchaeales;f__SAGMA-X;g__2517"
     """
     X_taxa_loc = X_taxa.reset_index()
     X_taxa_loc.rename(columns={X_taxa_loc.columns[0]: 'index'}, inplace=True)
@@ -105,14 +107,30 @@ def parse_taxa_spec(X_taxa):
     return X_taxa_split
 
 
-def group_taxa(X_taxa_split, levels=['kingdom', 'phylum']):
+# def group_taxa(X_taxa_split, levels=['kingdom', 'phylum']):
+#     """
+#     X_taxa_split: return value from `parse_taxa_spec_MLRepo`
+#     level: a list containing upto all levels kingdom; phylum; class; order; family; genus; species; strain
+#     """
+#     X_taxa = X_taxa_split.groupby(levels).sum()
+#     X_taxa.index = X_taxa.index.map(';'.join)
+#     return X_taxa
+
+
+def group_taxa(X_df, grp_to='genus'):
     """
-    X_taxa_split: return value from `parse_taxa_spec_MLRepo`
+    X_df: a pd.DataFrame where columns are subject labels and (row) index contains taxa names in the format of 
+            e.g. "k__Archaea;p__Crenarchaeota;c__Thaumarchaeota;o__Cenarchaeales;f__SAGMA-X;g__2517"
     level: a list containing upto all levels kingdom; phylum; class; order; family; genus; species; strain
     """
-    X_taxa = X_taxa_split.groupby(levels).sum()
-    X_taxa.index = X_taxa.index.map(';'.join)
-    return X_taxa
+    all_levels = ["kingdom", "phylum", "class",
+                  "order", "family", "genus", "species", "strain"]
+    idx_grp_to = all_levels.index(grp_to)
+    levels = all_levels[:(idx_grp_to+1)]
+    X_df_split = parse_taxa_spec(X_df)
+    X_gpd = X_df_split.groupby(levels).sum()
+    X_gpd.index = X_gpd.index.map(';'.join)
+    return X_gpd
 
 
 def progressive_filter(X_df):

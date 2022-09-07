@@ -12,7 +12,7 @@ from load_data_helper import *
 # load data
 # ^^^^^^
 
-def load_agg_shuffle(data_path, seed_num=2022):
+def load_agg_shuffle(data_path, seed_num=2022, verbose=True):
 
     y_labels, X_refseq_taxa, X_refseq_otu, X_meta = load_data(
         "qin2014", data_path=data_path)
@@ -20,16 +20,18 @@ def load_agg_shuffle(data_path, seed_num=2022):
     y = np.array([1 if y_i == 'Healthy' else -1 for y_i in y])
 
     # aggregate to species
-    X_refseq_taxa_parsed = parse_taxa_spec(X_refseq_taxa)
-    X_refseq_taxa = group_taxa(X_refseq_taxa_parsed, levels=["kingdom", "phylum", "class", "order",
-                                                             "family", "genus", "species"])
+    # X_refseq_taxa_parsed = parse_taxa_spec(X_refseq_taxa)
+    # X_refseq_taxa = group_taxa(X_refseq_taxa_parsed, levels=["kingdom", "phylum", "class", "order",
+    #                                                          "family", "genus", "species"])
+    X_refseq_taxa = group_taxa(X_refseq_taxa, grp_to="species")
 
     # comp_lbl = X_refseq_taxa['comp_lbl']
     X_count = X_refseq_taxa.T.to_numpy()
     comp_lbl = X_refseq_taxa.index.to_numpy()
-    print(X_count.shape)
-    print(y.shape)
-    print(comp_lbl.shape)
+    if verbose:
+        print(X_count.shape)
+        print(y.shape)
+        print(comp_lbl.shape)
 
     # shuffle once only
     rng = np.random.default_rng(seed_num)
@@ -45,7 +47,7 @@ def load_agg_shuffle(data_path, seed_num=2022):
 # ^^^^^^
 
 
-def filter_prep(X_count, comp_lbl):
+def filter_prep(X_count, comp_lbl, verbose=True):
 
     X_df = pd.DataFrame(X_count.T, index=comp_lbl, columns=[
                         'SUB_'+str(k) for k in range(X_count.shape[0])])
@@ -54,11 +56,12 @@ def filter_prep(X_count, comp_lbl):
     # manual progressive filtering
     beta0 = -10
     beta1 = 1
-    X_df, cols_keep = manual_filter(X_df, beta0, beta1, plot=True)
+    X_df, cols_keep = manual_filter(X_df, beta0, beta1, plot=verbose)
     label = label[cols_keep]
 
-    print(X_df.shape)
-    print(label.shape)
+    if verbose:
+        print(X_df.shape)
+        print(label.shape)
 
     return X_df, label
 
@@ -67,9 +70,9 @@ def filter_prep(X_count, comp_lbl):
 # ^^^^^^^
 
 
-def main(data_path, seed_num=2022):
-    X_count, y, comp_lbl = load_agg_shuffle(data_path, seed_num)
-    X_df, label = filter_prep(X_count, comp_lbl)
+def main(data_path, seed_num=2022, verbose=True):
+    X_count, y, comp_lbl = load_agg_shuffle(data_path, seed_num, verbose)
+    X_df, label = filter_prep(X_count, comp_lbl, verbose)
     return X_df, y, label
 
 

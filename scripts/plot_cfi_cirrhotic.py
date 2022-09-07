@@ -31,7 +31,7 @@ print(colors_all.shape)
 # load resutls
 # ^^^^^^^
 
-data_path = "/Users/hrt620/Documents/projects/kernelbiome_proj/kernelbiome_clean/data/MLRepo/qin2014"
+data_path = "/Users/hrt620/Documents/ku_projects/kernelbiome_proj/kernelbiome_clean/data/MLRepo/qin2014"
 X_df, y, label = load_cirrhotic.main(data_path=data_path, seed_num=seed_num)
 
 short_label = [lbl.split(';')[-1] for lbl in label]

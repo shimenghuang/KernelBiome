@@ -7,6 +7,7 @@ import sys  # nopep8
 path_root = Path(__file__).parents[1]  # nopep8
 sys.path.append(str(path_root))  # nopep8
 
+from kernelbiome.helpers_jax import *
 from kernelbiome.kernels_jax import *
 from kernelbiome.utils_cv import *
 from kernelbiome.utils_result import *
@@ -56,7 +57,7 @@ def kb_params(g1, g2):
 # ^^^^^^
 
 
-def wkb_params(g1, g2, w_unifrac_ma, w_unifrac_mb):
+def wkb_params(g1, g2, w_unifrac_ma, w_unifrac_mb=None):
 
     # UniFrac weight with MA
     weighted_kernel_params_dict_ma = default_weighted_kernel_params_grid(
@@ -65,12 +66,14 @@ def wkb_params(g1, g2, w_unifrac_ma, w_unifrac_mb):
         weighted_kernel_params_dict_ma, w_unifrac=w_unifrac_ma)
 
     # UniFrac weight with MB
-    weighted_kernel_params_dict_mb = default_weighted_kernel_params_grid(
-        w_unifrac_mb, g1, g2)
-    weighted_kmat_with_params_mb = get_weighted_kmat_with_params(
-        weighted_kernel_params_dict_mb, w_unifrac=w_unifrac_mb)
-
-    return weighted_kmat_with_params_ma, weighted_kmat_with_params_mb
+    if w_unifrac_mb is not None:
+        weighted_kernel_params_dict_mb = default_weighted_kernel_params_grid(
+            w_unifrac_mb, g1, g2)
+        weighted_kmat_with_params_mb = get_weighted_kmat_with_params(
+            weighted_kernel_params_dict_mb, w_unifrac=w_unifrac_mb)
+        return weighted_kmat_with_params_ma, weighted_kmat_with_params_mb
+    else:
+        return weighted_kmat_with_params_ma
 
 # %%
 # main
