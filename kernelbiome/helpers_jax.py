@@ -1,4 +1,5 @@
 from functools import partial
+import numpy as np
 import jax.numpy as jnp
 from jax import jit
 from jax import vmap
@@ -71,3 +72,23 @@ def gram(func, X, Y, **kwargs):
     >>> gram(k_rbf, X, Y, g=1)
     """
     return vmap(lambda x: vmap(lambda y: func(x, y, **kwargs))(Y))(X)
+
+
+def rbf_median_heruistic(X, clr=False, eps=0):
+    """
+    X: jax.numpy.ndarray
+    clr: whether to central-log-ratio transform X first.
+    eps: if clr is True, may require eps to be added to X to ensure positivity.
+    """
+
+    Xc = X + eps
+    if clr:
+        gm_Xc = gmean(Xc, axis=1)
+        clr_Xc = np.log(Xc/gm_Xc[:, None])
+        M = squared_euclidean_distances(clr_Xc, clr_Xc)
+    else:
+        M = squared_euclidean_distances(Xc, Xc)
+
+    M_triu = M[np.triu_indices(n=M.shape[0], k=1, m=M.shape[1])]
+    g = 1.0/np.median(M_triu)
+    return g
