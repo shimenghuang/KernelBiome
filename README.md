@@ -1,6 +1,6 @@
-# KernelBiome
+# KernelBiome package
 
-Note: This repository contains the python package `KernelBiome` and code that can reproduce results in the paper [Supervised Learning and Model Analysis with Compositional Data (Huang et al., 2022)](https://arxiv.org/abs/2205.07271). The `KernelBiome` python package can be installed via 
+The `KernelBiome` python package can be installed via 
 
 ```
 pip install kernelbiome
@@ -41,27 +41,28 @@ KB.fit(X, y)
 MSE = np.sqrt(np.mean((KB.predict(X) - y)**2))
 ```
 
-## The KernelBiome Package
-
 For a complete usage example, see `kernelbiome_illustration.py`
 
-## Reproducible Code
+
+# Reproducible Code
+
+This [repository](https://github.com/shimenghuang/KernelBiome) contains the python package `KernelBiome` and code that can reproduce results in the paper [Supervised Learning and Model Analysis with Compositional Data (Huang et al., 2022)](https://arxiv.org/abs/2205.07271). 
 
 All scripts producing results in the paper can be found in the `experiments` folder with some helper functions for the experiment scripts located in the `helpers` folder. Scripts starting with "run_" are used to run computation and save results, and scripts starting with "summarize_" are used to load and summarize results in e.g. figures. `data_original` and `data_processed` are folder to place the original and to save the processed datasets respectively. See README files therein for details.
 
-### `prediction`
+## `prediction`
 
 Prediction comparison on the 33 publicly available datasets on classification and regression.
 
-### `post_analysis`
+## `post_analysis`
 
 Post-analysis including CFI and kernel PCA for two of the public datasets, `cirrhosis` and `centralpark`.
 
-### `tree_visualization`
+## `tree_visualization`
 
 Visualization of CFI base on weighted and unweighted KernelBiome.
 
-### `consistency`
+## `consistency`
 
 Simulation to show consistency results in the paper.
 
