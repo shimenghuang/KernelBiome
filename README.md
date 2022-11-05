@@ -43,7 +43,7 @@ MSE = np.sqrt(np.mean((KB.predict(X) - y)**2))
 
 ## The KernelBiome Package
 
-For a complete example of the usage, see `kernelbiome_illustration.py`
+For a complete usage example, see `kernelbiome_illustration.py`
 
 ## Reproducible Code
 
@@ -69,4 +69,4 @@ Simulation to show consistency results in the paper.
 
 `log_contrast_example.py`: Illustration of CFI and CPD in the case of log contrast model using simulated data.
 
-`rescale_matters_example.py`: Comparison of CFI and CPD with relative influence (RI) and partial dependency plot (PDP).
+`rescale_matters_example.py`: Comparison of CFI and CPD with relative influence (RI) and partial dependency plot (PDP) based on simulated data.
