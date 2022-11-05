@@ -4,8 +4,6 @@ from jax import grad
 import matplotlib.pyplot as plt
 import numpy.linalg as la
 from sklearn.preprocessing import KernelCenterer
-import kernelbiome.kernels_jax as kj
-import kernelbiome.kernels_weighted_jax as wkj
 
 
 # ---- CPD calculation ----

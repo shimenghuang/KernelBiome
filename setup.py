@@ -24,6 +24,7 @@ setuptools.setup(
         'pandas>=1.3.5',
         'scikit-learn>=1.0.1',
         'jaxlib>=0.1.75',
-        'jax>=0.2.26'
+        'jax>=0.2.26',
+        'matplotlib>=3.5.1'
     ]
 )
