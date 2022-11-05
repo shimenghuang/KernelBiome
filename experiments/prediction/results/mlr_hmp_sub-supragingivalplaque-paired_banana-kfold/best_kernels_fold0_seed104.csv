@@ -1,0 +1,8 @@
+estimator_key,kmat_fun,avg_test_score,most_freq_best_param
+aitchison-rbf_c_0.0001890691138167192_g_0.0031408176707800437,<function wrap.<locals>.calc at 0x7fffbc17dd08>,0.7987987987987988,9.35975940219545
+aitchison_c_0.0013750240500322879,<function wrap.<locals>.calc at 0x7fffbc17d6a8>,0.7524024024024024,0.04256873901039055
+generalized-js_a_1_b_0.5,<function wrap.<locals>.calc at 0x7fffbc62d840>,0.7387387387387389,45.237740687615656
+hilbertian_a_10_b_-1,<function wrap.<locals>.calc at 0x7fffbc17d048>,0.7192942942942944,12.621455916519286
+heat-diffusion_t_0.08183728024685435,<function wrap.<locals>.calc at 0x7fffbc1b11e0>,0.716891891891892,14627967.542126665
+rbf_g_1.1589884869443636,<function wrap.<locals>.calc at 0x7fffbc62d8c8>,0.7167417417417418,17.384436441443796
+linear,<function kmat_linear at 0x7fffbc6bc950>,0.7083333333333334,351.40329487487827

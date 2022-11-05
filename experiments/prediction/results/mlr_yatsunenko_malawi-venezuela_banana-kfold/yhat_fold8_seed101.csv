@@ -1,0 +1,6 @@
+Baseline,SVM-RBF,Lin/Log-L1,RF,LogCont-L1,KernelBiome,KB_Aitchison
+1,1,1,1,-1,1,1
+1,-1,-1,1,1,1,1
+1,1,1,1,1,1,1
+1,-1,-1,-1,-1,-1,-1
+1,-1,-1,-1,-1,-1,-1

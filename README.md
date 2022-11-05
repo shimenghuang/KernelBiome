@@ -1,6 +1,6 @@
 # KernelBiome
 
-Note: This repository contains code that can reproduce outputs in the paper [Supervised Learning and Model Analysis with Compositional Data (Huang et al., 2022)](https://arxiv.org/abs/2205.07271). The `KernelBiome` python package can be installed via 
+Note: This repository contains the python package `KernelBiome` and code that can reproduce results in the paper [Supervised Learning and Model Analysis with Compositional Data (Huang et al., 2022)](https://arxiv.org/abs/2205.07271). The `KernelBiome` python package can be installed via 
 
 ```
 pip install kernelbiome
@@ -10,64 +10,59 @@ or
 python -m pip install git+https://github.com/shimenghuang/KernelBiome.git
 ```
 
-Minimum usage example for testing out installation:
+Small usage example:
 
 ```
 import numpy as np
-from kernelbiome.kernels_jax import *
+from kernelbiome.kernelbiome import KernelBiome
 
-x = np.random.uniform(0, 1, 5)
-x /= x.sum()
-y = np.random.uniform(0, 1, 5)
-y /= y.sum()
+# Simulated some data
+n = 100
+X1 = np.random.normal(0, 1, n)
+X2 = np.random.normal(0, 1, n)
+X3 = np.random.normal(0, 1, n)
+X4 = np.random.normal(0, 1, n)
+X = np.exp(np.c_[X1, X2, X3, X4])
+X /= X.sum(axis=1)[:, None]
+y = 5*(X[:, 0]+X[:, 1])/(X[:, 0]+X[:, 1]+X[:, 2]) + np.random.normal(0, 1, n)/2
 
-k_linear(x,y)
+# Fit KernelBiome
+KB = KernelBiome(kernel_estimator='KernelRidge',
+                 center_kmat=True,
+                 models=None,
+                 verbose=1)
+KB.fit(X, y)
+
+# Calculate mean squared error
+MSE = np.sqrt(np.mean((KB.predict(X) - y)**2))
 ```
 
 ## The KernelBiome Package
 
-The package contains the following modules:
-
-- `metrics_jax.py`: distance metrics with jax.
-- `kernels_jax.py`: kernel functions with jax.
-- `helpers_jax.py`: helper functions for kernels and metrics with jax.
-- `weighted_kernels_jax.py`: weighted kernel functions with jax.
-- `helpers_weighting.py`: helpers for calculating weight matrices. 
-- `cfi_and_cpd.py`: CFI and CPD calculation.
-- `nested_cv`: functions for nested CV.
-- `utils_cv.py`: utility functions including utilities for nested CV 
-- `utils_result.py`: utility functions for result summary.
+For a complete example of the usage, see `kernelbiome_illustration.py`
 
 ## Reproducible Code
 
-### `data`
+All scripts producing results in the paper can be found in the `experiments` folder with some helper functions for the experiment scripts located in the `helpers` folder. Scripts starting with "run_" are used to run computation and save results, and scripts starting with "summarize_" are used to load and summarize results in e.g. figures.
 
-This folder should contain two subfolders: 
+### `prediction`
 
-- `MLRepo` which should contain a subfolder `qin2014` containing data directly taken from [here](https://github.com/knights-lab/MLRepo/tree/master/datasets/qin2014).
-- `CentralParkSoil` should contain data pre-processed by `prep_centralparksoil.R` based on data from [here](https://github.com/jacobbien/trac-reproducible/tree/main/CentralParkSoil/original).
+Prediction comparison on the 33 publicly available datasets on classification and regression.
 
-### `scripts`
+### `post_analysis`
 
-This folder contains scripts that can reproduce resutls in the paper:
+Post-analysis including CFI and kernel PCA for two of the public datasets, `cirrhosis` and `centralpark`.
 
-- `tree_utils.py`: utility functions regardign the UniFrac distance.
-- `load_<ds>.py`: load the dataset into proper format.
-- `create_unifrac_weights_<ds>.py`: create the UniFrac based weight matrices.
-- `setup_params.py`: set up kernel parameters and hyperparameters.
-- `run_cfi_cpd_<ds>.py`: calculate CFI and CPD.
-- `plot_<ds>_cfi.py`: make CFI plot.
-- `plot_<ds>_cpd.py`: make CPD plot.
-- `plot_mds_cirrhotic.py`: make MDS plot.
-- `save_cv_indices_<ds>.py`: save the CV indices for the 50-fold CV comparison so that each approach is run on the same part of the data in `run_compare_one_fold_<ds>.py`.
-- `run_compare_one_fold_<ds>.py`: run one of the 50-fold CV using different methods.
+### `tree_visualization`
 
-where `<ds>` is one of `cirrhotic` or `centralparksoil`.
+Visualization of CFI base on weighted and unweighted KernelBiome.
 
-### `notebooks`
+### `consistency`
 
-This folder contains notebooks for demonstration:
+Simulation to show consistency results in the paper.
 
-- `simplex_heatmap.py`: heatmap functons to visualize kernels on 2-simplex.
-- `workflow_demo.ipynb`: A workflow demonstration using simulated data.
-- `visualization_writeup.ipynb`: Visualization of kernels with heatmap on 2-simplex.
+### `toy_examples`
+
+`log_contrast_example.py`: Illustration of CFI and CPD in the case of log contrast model using simulated data.
+
+`rescale_matters_example.py`: Comparison of CFI and CPD with relative influence (RI) and partial dependency plot (PDP).

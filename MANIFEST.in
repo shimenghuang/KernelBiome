@@ -1,3 +1,4 @@
-exclude script
-exclude data
-exclude notebooks
+exclude data_original
+exclude data_processed
+exclude experiments
+exclude helpers
