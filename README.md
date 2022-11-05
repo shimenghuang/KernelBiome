@@ -27,9 +27,13 @@ X /= X.sum(axis=1)[:, None]
 y = 5*(X[:, 0]+X[:, 1])/(X[:, 0]+X[:, 1]+X[:, 2]) + np.random.normal(0, 1, n)/2
 
 # Fit KernelBiome
+models = {
+    'linear': None,
+    'aitchison': {'c': np.logspace(-7, -3, 5)},
+}
 KB = KernelBiome(kernel_estimator='KernelRidge',
                  center_kmat=True,
-                 models=None,
+                 models=models, # `models=None` for using all default models
                  verbose=1)
 KB.fit(X, y)
 
