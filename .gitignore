@@ -1,7 +1,7 @@
 .DS_Store
 .python-version
+**/__pycache__
 kernelbiome.egg-info/
-kernelbiome/__pycache__
 data_original/*
 data_processed/*
 !data_original/scripts
