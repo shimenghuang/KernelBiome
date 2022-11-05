@@ -47,7 +47,7 @@ For a complete example of the usage, see `kernelbiome_illustration.py`
 
 ## Reproducible Code
 
-All scripts producing results in the paper can be found in the `experiments` folder with some helper functions for the experiment scripts located in the `helpers` folder. Scripts starting with "run_" are used to run computation and save results, and scripts starting with "summarize_" are used to load and summarize results in e.g. figures.
+All scripts producing results in the paper can be found in the `experiments` folder with some helper functions for the experiment scripts located in the `helpers` folder. Scripts starting with "run_" are used to run computation and save results, and scripts starting with "summarize_" are used to load and summarize results in e.g. figures. `data_original` and `data_processed` are folder to place the original and to save the processed datasets respectively. See README files therein for details.
 
 ### `prediction`
 
