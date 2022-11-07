@@ -79,7 +79,6 @@ elif data_name == "centralparksoil":
               }
 
 
-
 # --------------------------------------------------------------------------------------------------------------
 # Compute unifrac weights
 # --------------------------------------------------------------------------------------------------------------
@@ -101,7 +100,7 @@ for i in np.arange(n_taxa):
     for j in np.arange(n_taxa):
         if phylum_vec[i] != phylum_vec[j]:
             w_dummy[i, j] = 0
-#w_dummy = w_dummy / w_dummy.sum(axis=1)
+w_dummy = w_dummy / w_dummy.sum(axis=1)
 
 np.save(os.path.join(unifrac_path, f"{data_name}_w_dummy.npy"), w_dummy)
 
@@ -138,8 +137,8 @@ plt.savefig(os.path.join(unifrac_path, f"{data_name}_w_unifrac_MB_plot.pdf"))
 plt.imshow(w_dummy)
 plt.xlabel("Species")
 plt.ylabel("Species")
-plt.savefig(os.path.join(unifrac_path, f"{data_name}_w_unifrac_dummy_plot.pdf"))
-
+plt.savefig(os.path.join(
+    unifrac_path, f"{data_name}_w_unifrac_dummy_plot.pdf"))
 
 
 # --------------------------------------------------------------------------------------------------------------
@@ -199,5 +198,5 @@ for mod, par in models.items():
     node_df[f'cfi_unifrac_wmb_{mod}'] = cfi_unifrac_WMB
 
 # Save results
-node_df.to_csv(os.path.join(output_path, f"{data_name}_weights", 'CFIandLabels.csv'))
-
+node_df.to_csv(os.path.join(
+    output_path, f"{data_name}_weights", 'CFIandLabels.csv'))
