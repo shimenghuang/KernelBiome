@@ -9,5 +9,5 @@ The other than the `scripts` folder, the `data_original` folder should contain t
 - `GenomeMed`: https://github.com/SchlossLab/Baxter_glne007Modeling_GenomeMed_2015/tree/master/data
 - `Marine/original`: https://github.com/jacobbien/trac-reproducible/tree/main/Marine/original
 - `MLRepo`: http://metagenome.cs.umn.edu/public/MLRepo/datasets.tar.gz
-- `RMP`: upon request from the authors of https://www.nature.com/articles/nature24460 
+- `RMP`: upon request to Shimeng Huang (originally requested from the authors of https://www.nature.com/articles/nature24460) 
 - `sCD14_HIV/original`: https://github.com/jacobbien/trac-reproducible/tree/main/sCD14_HIV/original
