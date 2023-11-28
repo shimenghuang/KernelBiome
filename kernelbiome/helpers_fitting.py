@@ -217,7 +217,8 @@ def fit_single_model(X, y,
                      n_hyper_grid=10,
                      estimator_pars={},
                      n_fold=5,
-                     n_jobs=6, verbose=0):
+                     n_jobs=6,
+                     verbose=0):
     """
     Fits a single model by selecting optimal hyperparameters
     based on CV
@@ -243,28 +244,25 @@ def fit_single_model(X, y,
     else:
         transformer = None
 
-    # Add intercept for KernelRidge
+    # Calculate intercept separately if KernelRidge
     if estimator_name == "KernelRidge":
-        intercept = np.mean(y)
+        gscv.fit(K, y-np.mean(y))
+        intercept = np.mean(
+            y) - transformer.K_fit_rows_ @ gscv.best_estimator_.dual_coef_
     else:
+        gscv.fit(K, y)
         intercept = 0
 
-    # Fit model
-    gscv.fit(K, y-intercept)
-
     # Define prediction function
-    if center_kmat:
-        def pred_fun(X_new):
-            K = kmat_fun(X_new, X)
-            K = transformer.transform(K)
-            return gscv.best_estimator_.predict(K) + intercept
-    else:
-        def pred_fun(X_new):
-            K = kmat_fun(X_new, X)
-            return gscv.best_estimator_.predict(K) + intercept
+    def pred_fun(X_new):
+        K = kmat_fun(X_new, X)
+        return gscv.best_estimator_.predict(K) + intercept
 
     # Training score
-    train_score = gscv.score(K, y - intercept)
+    if estimator_name == "KernelRidge":
+        train_score = gscv.score(K, y-np.mean(y))
+    else:
+        train_score = gscv.score(K, y)
 
     # Collect output
     output = {'pred_fun': pred_fun,

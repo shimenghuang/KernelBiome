@@ -31,8 +31,7 @@ class KernelBiome:
             cv_pars={},
             estimator_pars={},
             n_jobs=1,
-            random_state=None,
-            verbose=1
+            random_state=None
     ):
         # Initialize all internal variables
         self.kernel_estimator_ = copy.deepcopy(kernel_estimator)
@@ -44,7 +43,6 @@ class KernelBiome:
         self._estimator_pars_outer = copy.deepcopy(estimator_pars)
         self._n_jobs = copy.deepcopy(n_jobs)
         self._random_state = copy.deepcopy(random_state)
-        self._verbose = copy.deepcopy(verbose)
         # Deal with special inputs
         if 'probability_refit' in self._estimator_pars:
             del self._estimator_pars_outer['probability_refit']
@@ -84,7 +82,7 @@ class KernelBiome:
                 "'KernelRidge', 'SVR', or 'SVC'.")
 
     # Fit KernelBiome
-    def fit(self, X, y, w=None):
+    def fit(self, X, y, w=None, verbose=1):
         """Fit model"""
         # Ensure data is in the simplex
         if np.abs(np.sum(X.sum(axis=1)) - X.shape[0]) > 10e-5:
@@ -141,15 +139,15 @@ class KernelBiome:
                                        self._cv_pars['n_fold_outer']),
                                       np.nan, dtype=object)
             time_estimators = np.full(n_estimator, np.nan)
-            if self._verbose > 0:
+            if verbose > 0:
                 print("Running outer CV...")
             for ii, (name, kmat_fun) in enumerate(kernel_dict.items()):
-                if self._verbose > 0:
+                if verbose > 0:
                     print(f"--- running: {name} ---")
                 # Time outer cv
                 time_estimators[ii] = timeit.default_timer()
                 # Run outer CV
-                if self._verbose > 0:
+                if verbose > 0:
                     lambdas = np.real(np.linalg.eigvals(kmat_fun(X, X)))
                     print('* max/min eigenvalue of K: ' +
                           str(np.max(lambdas)) + '/' + str(np.min(lambdas)))
@@ -165,11 +163,11 @@ class KernelBiome:
                     n_hyper_grid=self._n_hyper_grid,
                     estimator_pars=self._estimator_pars_outer,
                     n_jobs=self._n_jobs,
-                    verbose=self._verbose-1)
+                    verbose=verbose)
                 train_scores[ii, :] = cv_results['train_scores']
                 test_scores[ii, :] = cv_results['test_scores']
                 selected_params[ii, :] = cv_results['selected_params']
-                if self._verbose > 0:
+                if verbose > 0:
                     print(
                         f"* average test score: {np.mean(test_scores[ii, :])}")
                 # Time outer cv
@@ -187,10 +185,10 @@ class KernelBiome:
                 test_scores,
                 selected_params)
             model_selected = best_models.iloc[0]
-            if self._verbose > 0:
+            if verbose > 0:
                 print(f"best model is {model_selected.estimator_key}")
         else:
-            if self._verbose > 0:
+            if verbose > 0:
                 print(
                     "Not running outer CV since only one model was provided.")
             outer_cv_results = None
@@ -198,7 +196,7 @@ class KernelBiome:
             model_selected = {'estimator_key': list(kernel_dict.keys())[0],
                               'kmat_fun': list(kernel_dict.values())[0]}
         # Refit best model on full data
-        if self._verbose > 0:
+        if verbose > 0:
             print("Refit best model")
         fitted_mod = fit_single_model(
             X, y,
@@ -212,7 +210,7 @@ class KernelBiome:
             estimator_pars=self._estimator_pars,
             n_fold=self._cv_pars['n_fold_inner'],
             n_jobs=self._n_jobs,
-            verbose=self._verbose-1)
+            verbose=verbose)
         train_score = np.mean(fitted_mod['train_score'])
 
         # Combine model_selected and fitted_mod dicts
@@ -247,7 +245,7 @@ class KernelBiome:
         return self.fitted_model_['estimator'].predict_proba(K)
 
     # Compute CFI
-    def compute_cfi(self, Xtrain, Xnew=None, verbose=0):
+    def compute_cfi(self, Xtrain, Xnew=None, verbose=False):
         if Xnew is None:
             Xnew = Xtrain
         estimator_name = self.kernel_estimator_
@@ -284,7 +282,7 @@ class KernelBiome:
         cpd_vals = get_cpd(Xtrain, evaluation_grid,
                            self.fitted_model_['pred_fun'],
                            comp_idx, rescale, verbose=False)
-        return(cpd_vals)
+        return (cpd_vals)
 
     # Compute kernel principle components
     def kernelPCA(self, Xtrain, Xnew=None, num_pc=2):
@@ -359,7 +357,7 @@ class KernelBiome:
         """
         m1, d = X.shape
         m2, d2 = Y.shape
-        assert(d == d2)
+        assert (d == d2)
 
         k_fun = self.fitted_model_['kmat_fun']
 

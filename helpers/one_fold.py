@@ -5,6 +5,7 @@ from sklearn.svm import SVC, SVR
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from classo import classo_problem
 from kernelbiome.kernelbiome import KernelBiome
+from kernelbiome.helpers_fitting import default_kernel_models
 
 
 def run_bl(X_tr, y_tr, X_te, task_type, random_state=None):
@@ -149,7 +150,7 @@ def run_classo(X_tr, y_tr, X_te, task_type, random_state=None):
     return yscore, yhat
 
 
-def run_kb(X_tr, y_tr, X_te, task_type, scoring, param_grid=None,
+def run_kb(X_tr, y_tr, X_te, task_type, scoring,
            models=None, outer_cv_type=None, grp=None,
            n_hyper_grid=10, random_state=None, n_jobs=-1, outpath=None):
     """
@@ -187,6 +188,63 @@ def run_kb(X_tr, y_tr, X_te, task_type, scoring, param_grid=None,
                      random_state=random_state,
                      verbose=1)
     KB.fit(X_tr, y_tr)
+    if outpath is not None:
+        KB.best_models_.to_csv(outpath, index=False)
+
+    # Compute scores
+    if task_type == 'classification':
+        yscore = KB.predict_proba(X_te, X_tr)[:, 1]
+        yhat = KB.predict(X_te)
+    else:
+        yscore = KB.predict(X_te)
+        yhat = yscore
+
+    return yscore, yhat
+
+
+def run_wkb(X_tr, y_tr, X_te, W, task_type, scoring,
+            models=None, outer_cv_type=None, grp=None,
+            n_hyper_grid=10, random_state=None, n_jobs=-1, outpath=None):
+    """
+    yscore: between 0 and 1
+    yhat: -1 (yscore <= 0.5) or 1 (yscore > 0.5)
+    """
+    # Setup parameters
+    cv_pars = {'outer_cv_type': outer_cv_type,
+               'grp': grp,
+               'scoring': scoring}
+    estimator_pars = {'n_hyper_grid': n_hyper_grid}
+    if task_type == 'classification':
+        kernel_estimator = "SVC"
+        center_kmat = True
+        if cv_pars['outer_cv_type'] is None:
+            cv_pars['outer_cv_type'] = "stratified"
+        estimator_pars['probability_refit'] = True
+        estimator_pars['max_iter'] = 50000
+        estimator_pars['cache_size'] = 1000
+    else:
+        kernel_estimator = "KernelRidge"
+        center_kmat = True
+        if cv_pars['outer_cv_type'] is None:
+            cv_pars['outer_cv_type'] = "kfold"
+
+    # Fit Weighted KernelBiome
+    if models is None:
+        models_weighted = default_kernel_models(X_tr)
+        models_weighted = {k + "-weighted": v
+                           for k, v in models_weighted.items()}
+    else:
+        models_weighted = models.copy()
+    KB = KernelBiome(kernel_estimator=kernel_estimator,
+                     center_kmat=center_kmat,
+                     hyperpar_grid=None,
+                     models=models_weighted,
+                     cv_pars=cv_pars,
+                     estimator_pars=estimator_pars,
+                     n_jobs=n_jobs,
+                     random_state=random_state,
+                     verbose=1)
+    KB.fit(X_tr, y_tr, W)
     if outpath is not None:
         KB.best_models_.to_csv(outpath, index=False)
 

@@ -1,4 +1,15 @@
+# %%
+# path for interactive run
+# ^^
+from pathlib import Path  # nopep8
+import sys  # nopep8
+path_root = Path(__file__).parents[2]  # nopep8
+sys.path.append(str(path_root))  # nopep8
+print(sys.path)  # nopep8
+
+# %%
 # Imports
+# ^^
 from helpers.load_data import load_processed
 from helpers.one_fold import (run_bl, run_svm_rbf,
                               run_lr_l1, run_classo,
@@ -13,7 +24,9 @@ import numpy as np
 from sklearn.model_selection import (StratifiedKFold, LeaveOneOut,
                                      KFold)
 
+# %%
 # Add project to path
+# ^^
 path_root = Path(__file__).parents[2]
 sys.path.append(str(path_root))
 

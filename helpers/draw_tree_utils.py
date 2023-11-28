@@ -10,6 +10,43 @@ import plotly.express as px
 tax_levels = ["Kingdom", "Phylum", "Class", "Order", "Family", "Genus"]
 
 
+palette = np.hstack([px.colors.colorbrewer.Pastel1,
+                    px.colors.colorbrewer.Pastel2, px.colors.colorbrewer.Set3])
+edge_color_dict = {
+    "Proteobacteria": palette[11],
+    "Acidobacteria": palette[14],
+    "Bacteroidetes": palette[7],
+    "Actinobacteria": palette[3],
+    "Verrucomicrobia": palette[10],
+    "Firmicutes": palette[2],
+    "Crenarchaeota": palette[6],
+    "Planctomycetes": palette[7],
+    "Nitrospirae": palette[8],
+    "Fusobacteria": palette[13],
+    'dsDNA_viruses_no_RNA_stage': palette[1],
+    "Spirochaetes": palette[0],
+    "85": palette[5],
+    "25": palette[10],
+    "8": palette[15],
+    "22": palette[16],
+    "20": palette[17],
+    "24": palette[9],
+    "56": palette[9],
+    "32": palette[9],
+    "53": palette[9],
+    "64": palette[9],
+    "55": palette[9],
+    "29": palette[9],
+    "17": palette[9],
+    "62": palette[9],
+    "49": palette[9],
+    "9": palette[9],
+    "16": palette[9],
+    "42": palette[9],
+    "58": palette[9],
+}
+
+
 def create_node_df(label,
                    sep=";",
                    agg_level="Species",
@@ -41,7 +78,8 @@ def draw_tree(node_df,
               eff_max=5,
               tip_labels=True,
               title="CFI per microbe",
-              show_only_important=False):
+              show_only_important=False,
+              fontsize="32px"):
     node_df = node_df.reset_index()
 
     tree_dat = {}
@@ -61,19 +99,21 @@ def draw_tree(node_df,
     discrete_colors = np.hstack([discrete_colors_1, discrete_colors_2])
 
     sorted_cfi_vals_index = np.argsort(cfi_vals)
-    cfi_dict = dict(zip(node_df[agg_level].values[sorted_cfi_vals_index], np.arange(node_df.shape[0])))
-    #cfi_dict = dict(zip(node_df[agg_level].values, sorted_cfi_vals_index))
+    cfi_dict = dict(zip(
+        node_df[agg_level].values[sorted_cfi_vals_index], np.arange(node_df.shape[0])))
+    # cfi_dict = dict(zip(node_df[agg_level].values, sorted_cfi_vals_index))
 
     if show_only_important:
         list_highest_influence = []
-        font_type = {"font-size": "25px"}
+        font_type = {"font-size": fontsize}
         show_title = False
         show_legend = False
         for n in tree.treenode.traverse():
             n.add_feature(pr_name="color", pr_value="lightgray")
             n.add_feature(pr_name="effect", pr_value=0.0)
             if n.name in cfi_dict.keys():
-                n.add_feature(pr_name="color", pr_value=discrete_colors[cfi_dict[n.name]])
+                n.add_feature(pr_name="color",
+                              pr_value=discrete_colors[cfi_dict[n.name]])
                 n.add_feature(pr_name="effect", pr_value=.5)
                 if cfi_dict[n.name] > (len(cfi_vals) - 5):
                     n.add_feature(pr_name="effect",
@@ -120,8 +160,6 @@ def draw_tree(node_df,
         show_legend = True
         show_title = True
 
-
-
     canvas = toyplot.Canvas(width=1000, height=1000)
 
     # Area for tree plot
@@ -161,7 +199,8 @@ def draw_tree(node_df,
 
     # add area for plot title
     if show_title:
-        ax1 = canvas.cartesian(bounds=(50, 800, 50, 100), padding=0, label=title)
+        ax1 = canvas.cartesian(bounds=(50, 800, 50, 100),
+                               padding=0, label=title)
         ax1.x.show = False
         ax1.y.show = False
 
@@ -177,7 +216,7 @@ def draw_tree(node_df,
              toyplot.marker.create(shape="o", size=20, mstyle={"fill": discrete_colors_2[20]})),
             ("Positive CFI",
              toyplot.marker.create(shape="o", size=20, mstyle={"fill": discrete_colors_1[20]})),
-         ]
+        ]
         canvas.legend(markers2,
                       bounds=(800, 1000, 50, 200),
                       label="Directional Influence CFI"
@@ -187,7 +226,6 @@ def draw_tree(node_df,
 
 
 def get_phylo_levels(results, level, col="Cell Type"):
-
     """Get a taxonomy table (columns are "Kingdom", "Phylum", ...) from a
     DataFrame where the one column contains full taxon names.
 
@@ -324,40 +362,7 @@ def build_fancy_tree(data, agg_level):
 
     # Edge colors.  The color dictionary is hard-coded, keys must be
     # the names of all phyla in the data
-    palette = np.hstack([px.colors.colorbrewer.Pastel1, px.colors.colorbrewer.Pastel2, px.colors.colorbrewer.Set3])
-    edge_color_dict = {
-        "Proteobacteria": palette[11],
-        "Acidobacteria": palette[14],
-        "Bacteroidetes": palette[7],
-        "Actinobacteria": palette[3],
-        "Verrucomicrobia": palette[10],
-        "Firmicutes": palette[2],
-        "Crenarchaeota": palette[6],
-        "Planctomycetes": palette[7],
-        "Nitrospirae": palette[8],
-        "Fusobacteria": palette[13],
-        'dsDNA_viruses_no_RNA_stage': palette[1],
-        "Spirochaetes": palette[0],
-        "85": palette[5],
-        "25": palette[10],
-        "8": palette[15],
-        "22": palette[16],
-        "20": palette[17],
-        "24": palette[9],
-        "56": palette[9],
-        "32": palette[9],
-        "53": palette[9],
-        "64": palette[9],
-        "55": palette[9],
-        "29": palette[9],
-        "17": palette[9],
-        "62": palette[9],
-        "49": palette[9],
-        "9": palette[9],
-        "16": palette[9],
-        "42": palette[9],
-        "58": palette[9],
-    }
+    # TODO : move that out
 
     # marker objects for plotting a legend
     markers = []
@@ -378,7 +383,7 @@ def build_fancy_tree(data, agg_level):
                 n_.add_feature("edge_color", col)
 
             # Also add a marker for the legend
-            #col2 = '#%02x%02x%02x' % tuple([int(255*x)
+            # col2 = '#%02x%02x%02x' % tuple([int(255*x)
             #                                for x in col.tolist()[:-1]])
             col2 = col
             m = toyplot.marker.create(shape="o", size=8, mstyle={"fill": col2})

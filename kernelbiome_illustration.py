@@ -32,10 +32,9 @@ KB = KernelBiome(kernel_estimator='SVC',
                  cv_pars={},
                  estimator_pars={},
                  n_jobs=4,
-                 random_state=None,
-                 verbose=1)
+                 random_state=None)
 
-KB.fit(X, y)
+KB.fit(X, y, verbose=0)
 pcs, cc = KB.kernelPCA(X, num_pc=2)
 df = pd.DataFrame({'x1': pcs[:, 0],
                    'x2': pcs[:, 1],
@@ -62,8 +61,7 @@ for ind in range(bm.shape[0]):
                           cv_pars={},
                           estimator_pars={},
                           n_jobs=4,
-                          random_state=None,
-                          verbose=1)
+                          random_state=None)
     KBrefit.fit(X, y)
     cfis = list(KBrefit.compute_cfi(X))
     cfis_list.append(cfis)
@@ -135,8 +133,7 @@ y = 5*(X[:, 0]+X[:, 1])/(X[:, 0]+X[:, 1]+X[:, 2]) + np.random.normal(0, 1, n)/2
 # Fit KernelBiome
 KB = KernelBiome(kernel_estimator='KernelRidge',
                  center_kmat=True,
-                 models=None,
-                 verbose=1)
+                 models=None)
 KB.fit(X, y)
 # MSE
 MSE = np.sqrt(np.mean((KB.predict(X) - y)**2))
@@ -163,8 +160,7 @@ weighted_aitchison_mod = {
 
 KB = KernelBiome(kernel_estimator='KernelRidge',
                  center_kmat=True,
-                 models=weighted_aitchison_mod,
-                 verbose=1)
+                 models=weighted_aitchison_mod)
 KB.fit(X, y, w=W)
 # MSE
 MSE = np.sqrt(np.mean((KB.predict(X) - y)**2))
