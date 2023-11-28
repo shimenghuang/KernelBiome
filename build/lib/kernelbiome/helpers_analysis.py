@@ -53,7 +53,7 @@ def get_gen_grid(n_grid, p, min_val, max_val):
         min_val = np.repeat(min_val, p)
     if np.isscalar(max_val):
         max_val = np.repeat(max_val, p)
-    assert(len(min_val) == len(max_val))
+    assert (len(min_val) == len(max_val))
     gen_grid = np.linspace(min_val, max_val, num=n_grid)
     return gen_grid
 
@@ -100,7 +100,7 @@ def get_cpd(X, supp_grid, pred_fun, comp_idx=None,
         np.array of shape (len(cpd_idx), supp_grid.shape[0])
 
     """
-    assert(X.shape[1] == supp_grid.shape[1])
+    assert (X.shape[1] == supp_grid.shape[1])
     n, p = X.shape
     comp_idx = range(p) if comp_idx is None else comp_idx
     n_grid = supp_grid.shape[0]
@@ -192,15 +192,15 @@ def df_ke_dual_mat(X_eval, X_fit, center_kmat,
     """
     Calculate the derivative of a fitted kernel function via the dual problem.
     """
-    assert(len(dual_coef) == len(idx_supp))
+    assert (len(dual_coef) == len(idx_supp))
     n, p = X_eval.shape
     nn, pp = X_fit.shape
     df = np.zeros((n, p))
     dy_k_fun = grad(k_fun, argnums=1)
     if center_kmat:
         for ii in range(n):
-            if verbose > 0:
-                print(ii)
+            if verbose:
+                print(f"ii: {ii}")
             dk = np.zeros((nn, p))
             for jj in range(nn):
                 dk[jj] = np.array(dy_k_fun(X_fit[jj],
@@ -213,8 +213,8 @@ def df_ke_dual_mat(X_eval, X_fit, center_kmat,
                 df[ii] += dual_coef[kk] * dk[idx_supp[kk]]
     else:
         for ii in range(n):
-            if verbose > 0:
-                print(ii)
+            if verbose:
+                print(f"ii: {ii}")
             for jj in range(len(dual_coef)):
                 dk = np.array(dy_k_fun(X_fit[idx_supp[jj]],
                                        X_eval[ii], **kwargs))
