@@ -19,11 +19,10 @@ X, y, label_all, group_all = load_processed(data_name, data_path)
 X /= X.sum(axis=1)[:, None]
 print(X.shape)
 
-
+# %%
 # KernelBiome is a class and behaves similar to sklearn
 # estimators. The most default call to KernelBiome is the following
 # Note: this may take some time...
-
 
 KB = KernelBiome(kernel_estimator='SVC',
                  center_kmat=True,
@@ -34,7 +33,7 @@ KB = KernelBiome(kernel_estimator='SVC',
                  n_jobs=4,
                  random_state=None)
 
-KB.fit(X, y, verbose=0)
+KB.fit(X, y, verbose=1)
 pcs, cc = KB.kernelPCA(X, num_pc=2)
 df = pd.DataFrame({'x1': pcs[:, 0],
                    'x2': pcs[:, 1],
@@ -175,3 +174,5 @@ plt.show()
 pcs, expvar = KB.kernelPCA(X)
 plt.scatter(pcs[:, 0], pcs[:, 1], c=y, cmap='Greens_r')
 plt.show()
+
+# %%

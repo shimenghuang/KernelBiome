@@ -70,8 +70,8 @@ def get_hyperpar_grid(X, kmat_fun, estimator, n_grid=10, verbose=0):
                       "(e.g. heat-diffuision numerical issues")
         return None
     # Select grid based on spectrum of kernel
-    K_eigs = np.real(np.linalg.eigvals(K))
-    rank_tol = np.real(K_eigs.max() * K.shape[0] * np.core.finfo(K.dtype).eps)
+    K_eigs, _ = np.linalg.eigh(K)
+    rank_tol = K_eigs.max() * K.shape[0] * np.core.finfo(K.dtype).eps
     lbb = np.max([rank_tol*2, rank_tol*2 - K_eigs.min()])
     alpha_range = np.geomspace(lbb, 100*K_eigs.max(), n_grid)
 
